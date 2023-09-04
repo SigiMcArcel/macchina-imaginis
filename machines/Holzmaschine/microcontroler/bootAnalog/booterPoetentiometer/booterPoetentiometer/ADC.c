@@ -11,9 +11,10 @@
 void ADCinit()
 {
 	//VCC as input reference adc2
-	//VCC as input referenc
+	ADCSRA|=(1<<ADEN); 
 	ADMUX = 2;
 	ADCSRB  = 0; //free running mode
-	ADCSRA |= (1 << ADEN) | (1 << ADSC) | 3; //enable freerun,clockdiv 128
 	DIDR0 |=  (1 << ADC2D); //disable digital input 2
+	ADCSRA |= (1 << ADSC) |(1<<ADATE) | 3; //enable freerun,clockdiv 128
+	
 }

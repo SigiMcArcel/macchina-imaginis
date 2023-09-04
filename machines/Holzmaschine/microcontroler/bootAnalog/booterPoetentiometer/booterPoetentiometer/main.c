@@ -5,19 +5,64 @@
  * Author : Siegwart
  */ 
 
-#define F_CPU 8000000
+
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
 #include "I2CMaster.h"
 #include "I2CSlave.h"
 #include "ADC.h"
 
-static int step = 0;
+static int step = 30;
 static unsigned char i2cBuff[2];
 static int hoerterCount = 0;
-static unsigned char adcHigh,adcLow = 0;
 
-extern unsigned char* USI_Slave_register_buffer[];
+
+#define NULL_REGISTER 0xFF
+uint8_t currentRegister = NULL_REGISTER;
+
+void usitwi_onStart(uint8_t read) {
+	if (!read) {
+		currentRegister = NULL_REGISTER;
+	}
+}
+
+void usitwi_onStop() {
+	currentRegister = NULL_REGISTER;
+}
+
+uint8_t usitwi_onRead() {
+	switch(currentRegister) {
+		case 0:
+		return ADCL;
+		break;
+		case 1:
+		return ADCH;
+		break;
+		default:
+		return 0xFF;
+		break;
+	}
+	currentRegister = NULL_REGISTER;
+}
+
+void usitwi_onWrite(uint8_t value) {
+	if (currentRegister == NULL_REGISTER) {
+		currentRegister = value;
+		} else {
+		switch(currentRegister) {
+			case 0:
+			//register1 = ADCL;
+			break;
+			case 1:
+			//register2 = ADCH;
+			break;
+		}
+		currentRegister = NULL_REGISTER;
+	}
+}
+
+uint8_t usitwi_address = 0x42;
 
 int main(void)
 {
@@ -28,7 +73,8 @@ int main(void)
 			case 0: //init master
 			{
 				//set pb3 to input (raspberry ready)
-				DDRB &= ~(1 << PB3);
+				DDRB &= ~(1 << PB1);
+				PORTB |= (1 << PB1);  //activate pull-up resistor for PB3
 				//init master i2c
 				USI_I2C_Master_Init();
 				step = 10;
@@ -38,9 +84,10 @@ int main(void)
 			{
 				for(hoerterCount = 0;hoerterCount < 3;hoerterCount++)
 				{
-					i2cBuff[0] = (0x20 + hoerterCount);
+					i2cBuff[0] = (0x20 + hoerterCount) << 1;
 					i2cBuff[1] = 0x00;
 					USI_I2C_Master_Start_Transmission(i2cBuff, 2);
+					_delay_ms(250);
 				}
 				step = 20;
 				break;
@@ -49,12 +96,13 @@ int main(void)
 			{
 				for(hoerterCount = 0;hoerterCount < 3;hoerterCount++)
 				{
-					i2cBuff[0] = (0x20 + hoerterCount);
+					i2cBuff[0] = (0x20 + hoerterCount) << 1;
 					i2cBuff[1] = 0xFF;
 					USI_I2C_Master_Start_Transmission(i2cBuff, 2);
+					_delay_ms(250);
 				}
 				//Check raspberry
-				if(PORTB && (1 << PB3))
+				if((PINB & (1 << PB1)))
 				{
 					step = 30;
 				}
@@ -66,20 +114,18 @@ int main(void)
 			}
 			case 30: //init slave and adc
 			{
-				USI_I2C_Init(0x68);
+				usitwi_init();
 				ADCinit();
-				USI_Slave_register_buffer[0] = &adcLow;
-				USI_Slave_register_buffer[1] = &adcHigh;
+				sei();
 				step = 40; //idle
 			}
 			case 40:
 			{
-				adcLow = ADCL;
-				adcHigh = ADCH;
+				
 				break;
 			}
 		}
-		_delay_ms(250);
+		
     }
 }
 

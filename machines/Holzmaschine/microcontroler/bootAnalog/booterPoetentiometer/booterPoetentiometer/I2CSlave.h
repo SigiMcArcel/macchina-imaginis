@@ -1,41 +1,30 @@
-/*-----------------------------------------------------*\
-|  USI I2C Slave Driver                                 |
-|                                                       |
-| This library provides a robust, interrupt-driven I2C  |
-| slave implementation built on the ATTiny Universal    |
-| Serial Interface (USI) hardware.  Slave operation is  |
-| implemented as a register bank, where each 'register' |
-| is a pointer to an 8-bit variable in the main code.   |
-| This was chosen to make I2C integration transparent   |
-| to the mainline code and making I2C reads simple.     |
-| This library also works well with the Linux I2C-Tools |
-| utilities i2cdetect, i2cget, i2cset, and i2cdump.     |
-|                                                       |
-| Adam Honse (GitHub: CalcProgrammer1) - 7/29/2012      |
-|            -calcprogrammer1@gmail.com                 |
-\*-----------------------------------------------------*/
+/*
 
+Copyright 2007 Donald R. Blake <donblake at worldnet.att.net>
+Copyright 2010 Jochen Toppe    <jochen.toppe at jtoee.com>
+Copyright 2011 Ben Galvin      <bgalvin at fastmail.fm>
+Copyright 2012 Niclas Hoyer    <niclas at verbugt.de>
 
-#ifndef I2CSLAVE_H_
-#define I2CSLAVE_H_
+This file is part of Usitwi.
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
+Usitwi is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
+Usitwi is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-#define DDR_USI			DDRB
-#define PORT_USI		PORTB
-#define PIN_USI			PINB
-#define PORT_USI_SDA	PB0
-#define PORT_USI_SCL	PB2
-#define PIN_USI_SDA		PINB0
-#define PIN_USI_SCL		PINB2
+You should have received a copy of the GNU General Public License
+along with Usitwi.  If not, see <http://www.gnu.org/licenses/>.
 
+*/
 
-//USI I2C Initialize
-//  address - If slave, this parameter is the slave address
-void USI_I2C_Init(unsigned  char address);
+#ifndef _USI_TWI_SLAVE_H_
+#define _USI_TWI_SLAVE_H_
 
+void usitwi_init();
 
-
-#endif /* I2CSLAVE_H_ */
+#endif

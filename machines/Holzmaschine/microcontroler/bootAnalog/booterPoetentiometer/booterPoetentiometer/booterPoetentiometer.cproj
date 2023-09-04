@@ -93,7 +93,7 @@
   <avrgcc.compiler.symbols.DefSymbols>
     <ListValues>
       <Value>DEBUG</Value>
-      <Value>F_CPU=8000000</Value>
+      <Value>F_CPU=80000000UL</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
@@ -127,6 +127,9 @@
     <Compile Include="ADC.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="I2CMaros.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="I2CMaster.c">
       <SubType>compile</SubType>
     </Compile>
@@ -140,6 +143,9 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="target.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
