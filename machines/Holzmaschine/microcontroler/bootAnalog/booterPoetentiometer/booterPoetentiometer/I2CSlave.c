@@ -52,6 +52,7 @@ extern uint8_t usitwi_onRead();
 extern void    usitwi_onWrite(uint8_t value);
 extern void    usitwi_onStart(uint8_t rw);
 extern void    usitwi_onStop();
+extern void    usitwi_onAcknowledge();
 
 /*
  * # Initializing

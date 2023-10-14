@@ -13,52 +13,49 @@
 #include "I2CSlave.h"
 #include "ADC.h"
 
-static int step = 30;
-static unsigned char i2cBuff[2];
-static int hoerterCount = 0;
+extern uint16_t ADCValueL;
+extern uint16_t ADCValueH;
 
 
-#define NULL_REGISTER 0xFF
-uint8_t currentRegister = NULL_REGISTER;
+#define NULL_REGISTER 0x00
+uint8_t currentRegisterR = NULL_REGISTER;
+uint8_t currentRegisterW = NULL_REGISTER;
 
 void usitwi_onStart(uint8_t read) {
 	if (!read) {
-		currentRegister = NULL_REGISTER;
+		currentRegisterR = NULL_REGISTER;
 	}
 }
 
 void usitwi_onStop() {
-	currentRegister = NULL_REGISTER;
+	currentRegisterR = NULL_REGISTER;
 }
 
 uint8_t usitwi_onRead() {
-	switch(currentRegister) {
+	uint8_t value = 0;
+	switch(currentRegisterR) {
 		case 0:
-		return ADCL;
+		value = ADCValueL;
 		break;
 		case 1:
-		return ADCH;
+		value = ADCValueH;
 		break;
 		default:
 		return 0xFF;
 		break;
 	}
-	currentRegister = NULL_REGISTER;
+	currentRegisterR++;
+	if(currentRegisterR > 1)
+	{
+		currentRegisterR = NULL_REGISTER;
+	}
+	return value;
 }
 
 void usitwi_onWrite(uint8_t value) {
-	if (currentRegister == NULL_REGISTER) {
-		currentRegister = value;
-		} else {
-		switch(currentRegister) {
-			case 0:
-			//register1 = ADCL;
-			break;
-			case 1:
-			//register2 = ADCH;
-			break;
-		}
-		currentRegister = NULL_REGISTER;
+	if(value == 0xff)
+	{
+		currentRegisterR = NULL_REGISTER;
 	}
 }
 
@@ -66,66 +63,12 @@ uint8_t usitwi_address = 0x42;
 
 int main(void)
 {
+	usitwi_init();
+	ADCinit();
+	sei();
     while (1) 
     {
-		switch(step)
-		{
-			case 0: //init master
-			{
-				//set pb3 to input (raspberry ready)
-				DDRB &= ~(1 << PB1);
-				PORTB |= (1 << PB1);  //activate pull-up resistor for PB3
-				//init master i2c
-				USI_I2C_Master_Init();
-				step = 10;
-				break;
-			}
-			case 10: //lamps on
-			{
-				for(hoerterCount = 0;hoerterCount < 3;hoerterCount++)
-				{
-					i2cBuff[0] = (0x20 + hoerterCount) << 1;
-					i2cBuff[1] = 0x00;
-					USI_I2C_Master_Start_Transmission(i2cBuff, 2);
-					_delay_ms(250);
-				}
-				step = 20;
-				break;
-			}
-			case 20: //lamps off
-			{
-				for(hoerterCount = 0;hoerterCount < 3;hoerterCount++)
-				{
-					i2cBuff[0] = (0x20 + hoerterCount) << 1;
-					i2cBuff[1] = 0xFF;
-					USI_I2C_Master_Start_Transmission(i2cBuff, 2);
-					_delay_ms(250);
-				}
-				//Check raspberry
-				if((PINB & (1 << PB1)))
-				{
-					step = 30;
-				}
-				else
-				{
-					step = 10;
-				}
-				break;
-			}
-			case 30: //init slave and adc
-			{
-				usitwi_init();
-				ADCinit();
-				sei();
-				step = 40; //idle
-			}
-			case 40:
-			{
-				
-				break;
-			}
-		}
 		
-    }
+	}
 }
 
