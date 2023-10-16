@@ -6,7 +6,7 @@ INCLUDEDIR=/usr/include
 
 INCLUDES = -I. -I/.
 CXX_FLAGS = -fpic -Wall
-LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile
+LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lmidriver
 
 SOURCES=main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
