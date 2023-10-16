@@ -1,8 +1,7 @@
-
-
 DESTDIR=
-LIBDIR=/usr/lib
-INCLUDEDIR=/usr/include
+prefix=/usr
+bindir=/usr/lib
+
 
 INCLUDES = -I. -I/.
 CXX_FLAGS = -fpic -Wall
@@ -20,4 +19,9 @@ $(EXEOUT):$(OBJECTS)
 	$(CXX) $(LD_FLAGS) $(OBJECTS) -o $(EXEOUT)
 clean:
 	$(RM) $(EXEOUT) *.o
+
+install:
+	install -D -d $(DESTDIR)/${bindir}
+	install -D -m 0755 $(EXEOUT) $(DESTDIR)/${bindir}/$(EXEOUT) 
+
 	
