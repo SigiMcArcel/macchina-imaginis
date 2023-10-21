@@ -9,13 +9,14 @@
 
 int main()
 {
-    if (daemon(0, 0)) {
+    if (daemon(0, 1)) {
         perror("Unable to daemonize");
         return 1;
     }
 
     const std::string _WavePath = std::string("/home/root/sounds");
 
+    printf("miwoodenmachine\n");
     mimodule::ModuleHoerterInput Module1(0x38, "Module1");
     mimodule::ModuleHoerterInput Module2(0x39, "Module2");
     mimodule::ModuleHoerterInput Module3(0x3A, "Module3");
@@ -57,7 +58,6 @@ int main()
     man.start();
     while (true)
     {
-
         usleep(100000);
     }
     return 0;
