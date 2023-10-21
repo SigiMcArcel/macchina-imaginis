@@ -9,6 +9,11 @@
 
 int main()
 {
+    if (daemon(0, 0)) {
+        perror("Unable to daemonize");
+        return 1;
+    }
+
     const std::string _WavePath = std::string("/home/root/sounds");
 
     mimodule::ModuleHoerterInput Module1(0x38, "Module1");
