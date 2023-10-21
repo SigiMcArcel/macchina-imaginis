@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <sys/mount.h>
 #include <mi/micomponents/miPlayWaveButtonLamp.h>
 #include <mi/mimodules/ModuleHoerterInput.h>
 #include <mi/mimodules/ModuleHoerterOutput.h>
@@ -7,16 +8,44 @@
 #include <mi/mimodules/ModuleManager.h>
 #include <mi/misound/Alsa.h>
 
-int main()
+int main(int argc, char* argv[])
 {
-    if (daemon(0, 1)) {
-        perror("Unable to daemonize");
-        return 1;
+    int handle = -1;
+    if (argc == 2)
+    {
+
+        if(strcmp(argv[1],"-d") == 0)
+            printf("miwoodenmachine daemonize\n");
+            if (daemon(1, 1)) {
+                perror("Unable to daemonize");
+                    return 1;
+            }
     }
 
+    fprintf(stderr,"miwoodenmachine\n");
+    
+    handle = ::open("/dev/sda1", O_RDWR);
+    if (handle == -1)
+    {
+        printf("miwoodenmachine failed -> no usb\n");
+    }
+    ::close(handle);
+    if (mount("/dev/sda1", "/home/root/sounds", "vfat", MS_NOATIME, NULL)) {
+        if (errno == EBUSY) {
+            printf("miwoodenmachine Mountpoint busy\n");
+            return 1;
+        }
+        else {
+            printf("miwoodenmachine Mount error: %s\n", strerror(errno));
+            return 1;
+        }
+    }
+    else {
+        printf("miwoodenmachine Mount successful\n");
+    }
     const std::string _WavePath = std::string("/home/root/sounds");
 
-    printf("miwoodenmachine\n");
+   
     mimodule::ModuleHoerterInput Module1(0x38, "Module1");
     mimodule::ModuleHoerterInput Module2(0x39, "Module2");
     mimodule::ModuleHoerterInput Module3(0x3A, "Module3");
