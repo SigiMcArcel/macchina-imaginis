@@ -14,12 +14,13 @@ int main(int argc, char* argv[])
     if (argc == 2)
     {
 
-        if(strcmp(argv[1],"-d") == 0)
+        if (::strcmp(argv[1], "-d") == 0) {
             printf("miwoodenmachine daemonize\n");
-            if (daemon(1, 1)) {
+            if (::daemon(1, 1)) {
                 perror("Unable to daemonize");
-                    return 1;
+                return 1;
             }
+        }
     }
 
     fprintf(stderr,"miwoodenmachine\n");
@@ -52,7 +53,7 @@ int main(int argc, char* argv[])
     mimodule::ModuleHoerterOutput Module4(0x20, "Module4");
     mimodule::ModuleHoerterOutput Module5(0x21, "Module5");
     mimodule::ModuleHoerterOutput Module6(0x22, "Module6");
-    mimodule::ModuleMiPotentiometer ModulVolume(0x42, 3, "Volume");
+    mimodule::ModuleMiPotentiometer ModulVolume(0x42, 10, "Volume");
 
     micomponents::miVolume volume(ModulVolume.getChannel("Potentiometer"));
     micomponents::miPlayWaveButtonLamp lamp01(micomponents::LampType::Flash, 250, Module1.getChannel("E1"), Module4.getChannel("A1"), "P1", micomponents::ButtonType::Switch, false, _WavePath, true);
@@ -76,7 +77,7 @@ int main(int argc, char* argv[])
     micomponents::miPlayWaveButtonLamp lamp19(micomponents::LampType::Flash, 250, Module3.getChannel("E3"), Module6.getChannel("A3"), "P18", micomponents::ButtonType::Switch, false, _WavePath, true);
     micomponents::miPlayWaveButtonLamp lamp20(micomponents::LampType::Flash, 250, Module3.getChannel("E4"), Module6.getChannel("A4"), "P19", micomponents::ButtonType::Switch, false, _WavePath, true);
 
-    mimodule::ModuleManager man(100);
+    mimodule::ModuleManager man(20);
     man.addModule(&Module1);
     man.addModule(&Module2);
     man.addModule(&Module3);
