@@ -4,7 +4,7 @@ bindir=/usr/lib
 
 
 INCLUDES = -I. -I/.
-CXX_FLAGS = -fpic -Wall
+CXXFLAGS = -fpic -Wall -Wl,--no-undefined
 LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lmidriver
 
 SOURCES=main.cpp
@@ -14,7 +14,7 @@ EXEOUT=miwoodenmachine
 
 
 .cpp.o:
-	$(CXX) $(CXX_FLAGS) $(INCLUDES) -c $<
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $<
 $(EXEOUT):$(OBJECTS)
 	$(CXX) $(LD_FLAGS) $(OBJECTS) -o $(EXEOUT)
 clean:
