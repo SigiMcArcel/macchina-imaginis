@@ -10,7 +10,7 @@
 #define ADC_H_
 
 void ADCinit();
-
+void ADCRun();
 
 
 #endif /* ADC_H_ */

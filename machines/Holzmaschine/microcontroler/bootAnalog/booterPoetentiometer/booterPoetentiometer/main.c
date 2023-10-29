@@ -68,7 +68,8 @@ int main(void)
 	sei();
     while (1) 
     {
-		
+		ADCRun();
+		_delay_ms(20);
 	}
 }
 

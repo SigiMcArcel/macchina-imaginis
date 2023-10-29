@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     mimodule::ModuleHoerterOutput Module4(0x20, "Module4");
     mimodule::ModuleHoerterOutput Module5(0x21, "Module5");
     mimodule::ModuleHoerterOutput Module6(0x22, "Module6");
-    mimodule::ModuleMiPotentiometer ModulVolume(0x42, 10, "Volume");
+    mimodule::ModuleMiPotentiometer ModulVolume(0x42, 3, "Volume");
 
     micomponents::miVolume volume(ModulVolume.getChannel("Potentiometer"));
     micomponents::miPlayWaveButtonLamp lamp01(micomponents::LampType::Flash, 250, Module1.getChannel("E1"), Module4.getChannel("A1"), "P1", micomponents::ButtonType::Switch, false, _WavePath, true);
@@ -75,9 +75,9 @@ int main(int argc, char* argv[])
     micomponents::miPlayWaveButtonLamp lamp17(micomponents::LampType::Flash, 250, Module3.getChannel("E1"), Module6.getChannel("A1"), "P16", micomponents::ButtonType::Switch, false, _WavePath, true);
     micomponents::miPlayWaveButtonLamp lamp18(micomponents::LampType::Flash, 250, Module3.getChannel("E2"), Module6.getChannel("A2"), "P17", micomponents::ButtonType::Switch, false, _WavePath, true);
     micomponents::miPlayWaveButtonLamp lamp19(micomponents::LampType::Flash, 250, Module3.getChannel("E3"), Module6.getChannel("A3"), "P18", micomponents::ButtonType::Switch, false, _WavePath, true);
-    micomponents::miPlayWaveButtonLamp lamp20(micomponents::LampType::Flash, 250, Module3.getChannel("E4"), Module6.getChannel("A4"), "P19", micomponents::ButtonType::Switch, false, _WavePath, true);
+    micomponents::miPlayWaveButtonLamp lamp20(micomponents::LampType::Flash, 250, Module3.getChannel("E4"), Module6.getChannel("A7"), "P19", micomponents::ButtonType::Switch, false, _WavePath, true);
 
-    mimodule::ModuleManager man(20);
+    mimodule::ModuleManager man(50);
     man.addModule(&Module1);
     man.addModule(&Module2);
     man.addModule(&Module3);

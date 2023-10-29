@@ -14,12 +14,16 @@ uint16_t ADCValueH = 0;
 void ADCinit()
 {
 	//VCC as input reference adc2
-	ADCSRA|=(1<<ADEN); 
+	ADCSRA =(1<<ADEN); 
 	ADMUX = 2;
 	ADCSRB  = 0; //free running mode
 	DIDR0 |=  (1 << ADC2D); //disable digital input 2
-	ADCSRA |= (1 << ADSC) |(1<<ADATE) | (1 << ADIE) | 3; //enable freerun,clockdiv 128
-	
+	ADCSRA |=  (1 << ADIE) | 3; //enable freerun,clockdiv 128
+}
+
+void ADCRun()
+{
+	ADCSRA |= (1 << ADSC);
 }
 
 ISR(ADC_vect)
