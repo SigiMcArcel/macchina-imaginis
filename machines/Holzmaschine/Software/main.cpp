@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     mimodule::ModuleHoerterOutput Module6(0x22, "Module6");
     mimodule::ModuleMiPotentiometer ModulVolume(0x42, 3, "Volume");
 
-    micomponents::miVolume volume(ModulVolume.getChannel("Potentiometer"));
+    micomponents::miVolume volume(ModulVolume.getChannel("Potentiometer"),20,100);
     micomponents::miPlayWaveButtonLamp lamp01(micomponents::LampType::Flash, 250, Module1.getChannel("E1"), Module4.getChannel("A1"), "P1", micomponents::ButtonType::Switch, false, _WavePath, true);
     micomponents::miPlayWaveButtonLamp lamp02(micomponents::LampType::Flash, 250, Module1.getChannel("E2"), Module4.getChannel("A2"), "P1", micomponents::ButtonType::Switch, false, _WavePath, true);
     micomponents::miPlayWaveButtonLamp lamp03(micomponents::LampType::Flash, 250, Module1.getChannel("E3"), Module4.getChannel("A3"), "P2", micomponents::ButtonType::Switch, false, _WavePath, true);
