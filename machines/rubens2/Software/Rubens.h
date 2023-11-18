@@ -10,6 +10,8 @@
 #include <mi/miutils/Timer.h>
 #include <list>
 
+#include "Leonardo.h"
+
 namespace rubens2
 {
 	enum  struct Cmd_e
@@ -34,7 +36,7 @@ namespace rubens2
 	};
 
 
-class Rubens :public micomponents::miButtonEventInterface, public miutils::EventListener
+class Rubens :public micomponents::miButtonEventInterface, public miutils::EventListener, public Leonardo::PotChangedEvent
 {
 	
 private:
@@ -51,6 +53,9 @@ private:
 
 	std::string _WavePath;
 	miutils::Timer _Timer;
+
+	misound::AlsaVolume _Volume;
+	Leonardo _Leonardo;
 
 	bool _StartProgram;
 	int _ProgramStep;
@@ -92,12 +97,17 @@ public:
 	,_DoepferOutputChannel1(1, "_DoepferOutputChannel1")
 	,_WavePath(wavePath)
 	,_Timer("Program",this)
+	, _Volume(20)
+	,_Leonardo("/dev/ttyAMA0",this)
+	, _StartProgram(false)
+	, _ProgramStep(0)
 	{
 		_ModuleManager.addModule(&_DoepferInputChannel0);
 		_ModuleManager.addModule(&_DoepferOutputChannel0);
 		_ModuleManager.addModule(&_DoepferOutputChannel1);
 		createComponents();
 		createProgramm();
+		_Leonardo.run();
 	}
 
 
@@ -114,6 +124,11 @@ public:
 		_Timer.Stop();
 	}
 
+
+
+	// Geerbt über PotChangedEvent
+	virtual void potValueChanged(int val) override;
+	
 
 };
 }

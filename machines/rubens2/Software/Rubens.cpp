@@ -1,17 +1,20 @@
 #include "Rubens.h"
 
+
 using namespace rubens2;
 
 void Rubens::ButtonDown(const std::string& name)
 {
 	if (name == "emergencyStop")
 	{
-		_ProgramStep = 2000;
+		_StartProgram = false;
 		_ButtonLampManager.emergencyStopAll(true);
+		_Leonardo.text("Emergency stop");
 	}
 	else if(name == "lampControl")
 	{
 		_ButtonLampManager.lampControlAll(true);
+		_Leonardo.text("Lamp control");
 	}
 	else if  (name == "program")
 	{
@@ -29,11 +32,13 @@ void Rubens::ButtonUp(const std::string& name)
 	if (name == "emergencyStop")
 	{
 		_StartProgram = false;
+		_Leonardo.run();
 		_ButtonLampManager.emergencyStopAll(false);
 	}
 	else if (name == "lampControl")
 	{
 		_ButtonLampManager.lampControlAll(false);
+		_Leonardo.run();
 	}
 	else if (name == "program")
 	{
@@ -61,10 +66,13 @@ void Rubens::addProgrammEntry(const std::string& name, Cmd_e cmd)
 	_ProgramList.push_back(p);
 }
 
+void rubens2::Rubens::potValueChanged(int val)
+{
+	_Volume.setVolume(val);
+}
+
 void Rubens::createProgramm()
 {
-
-
 	addProgrammEntry("A7", Cmd_e::on);
 	addProgrammEntry("A7", Cmd_e::pause);
 	addProgrammEntry("A7", Cmd_e::off);
@@ -115,6 +123,7 @@ void Rubens::eventOccured(void* sender, const std::string& name)
 		RubensProgramm p = _ProgramList[_ProgramStep];
 		if (p._Cmd == Cmd_e::pause)
 		{
+			_ProgramStep++;
 			return;
 		}
 		if (p._Cmd == Cmd_e::on)
@@ -126,7 +135,7 @@ void Rubens::eventOccured(void* sender, const std::string& name)
 			_ButtonLampManager.LampOff(p._Name);
 		}
 		
-		if (_ProgramStep >= _ProgramList.size())
+		if (_ProgramStep >= static_cast<int>(_ProgramList.size()))
 		{
 			_ProgramStep = 0;
 		}

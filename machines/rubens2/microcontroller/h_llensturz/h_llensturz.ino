@@ -190,11 +190,11 @@ bool waitFor(int ticks,int nextStep)
     return false;
 }
 
-void loop() 
+void displayProcess()
 {
   switch(iStep)
   {
-    case 0://PC Button 1 Sekunde betätigen
+    case 0:
     {
       char txt[9] = "booting";
       BigDisplay_WriteText(txt);
@@ -214,39 +214,52 @@ void loop()
         BigDisplay_Random();
         break;
     }
-    
-    case 30://emergency stop init
-    {
-        matrix.clear();
-        lc.clearDisplay(0);
-        iStep = 20;
-        break;
-    }
-
-    case 40: //emergency stop
-    {
-        char txt[9] = "Emergency";
-        BigDisplay_WriteText(txt);
-    }
   }
-
-  delay(250);
-
+}
+void loop() 
+{
+  int tickCount = 0;
+  int lastVal = 0;
+  
+  if((tickCount%25) == 0)
+  {
+      displayProcess();
+  }
+  if((tickCount%2) == 0)
+  {
+      int val = analogRead(PIN11);
+      val = 5 /1024*val;
+      if(lastVal = val)
+      {
+        Serial.print("POT:");
+        Serial.print(val,16);
+        Serial.print("\n");
+      }
+      lastVal = val;
+  }
   if(Serial.available())
   {
     size_t size = 0;
     size = Serial.readBytesUntil('\n',rxData,9);
-    if(strcmp(rxData,"run") == 0)
+    if(strncmp(rxData,"RUN:",4) == 0)
     {
        iStep = 10;
     }
-    else if(strcmp(rxData,"emc") == 0)
+    else if(strncmp(rxData,"STOP:",5) == 0)
     {
-       iStep = 30;
+       iStep = 3000;
+       matrix.clear();
+      lc.clearDisplay(0);
     }
-    Serial.print(rxData);
-      
+    else if(strncmp(rxData,"TXT:",4) == 0)
+    {
+       iStep = 3000;
+       matrix.clear();
+      lc.clearDisplay(0);
+      BigDisplay_WriteText(rxData + 4);
+    }
   }
-  
+  tickCount++;
+  delay(10);
 
 }
