@@ -7,7 +7,7 @@ INCLUDES = -I. -I/.
 CXXFLAGS = -fpic -Wall -Wl,--no-undefined
 LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lmidriver
 
-SOURCES=main.cpp
+SOURCES=main.cpp Rubens.cpp Leonardo.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
 EXEOUT=rubens
