@@ -4,17 +4,17 @@
 #include <Wire.h> // Enable this line if using Arduino Uno, Mega, etc.
 #include <Adafruit_LEDBackpack.h>
 
-#define PIN13 13
+/*#define PIN13 13
 #define PIN12 12
-#define PIN11 11
+#define PIN18 18
 #define PIN10 10
 #define PIN9 9
 
 #define POWER PIN12
-#define PCBUTTON PIN11
+
 
 #define POWERSWITCH PIN10
-#define EMCSTOP PIN9
+#define EMCSTOP PIN9*/
  
 unsigned char Alphanumeric[] = 
         {
@@ -83,19 +83,16 @@ unsigned char Alphanumeric[] =
         };
 
 Adafruit_7segment matrix = Adafruit_7segment();
- /*
-  Now we need a LedControl to work with.
-  ***** These pin numbers will probably not work with your hardware *****
-  pin 12 is connected to the DataIn
-  pin 11 is connected to the CLK
-  pin 10 is connected to LOAD
-  We have only a single MAX72XX.
-  */
-  LedControl lc=LedControl(7,6,5,1);
+
+LedControl lc=LedControl(7,5,6,1);
 
 int iStep = 0;
 int timer = 0;
-char rxData[9] = {0};
+int tickCount = 0;
+float lastVal = 0;
+int rowCount = 0;
+bool toggle = false;
+char rxData[100] = {0};
 
 void SmallDisplay_Init()
 {
@@ -117,33 +114,12 @@ void BigDisplay_Init()
    */
   lc.shutdown(0,false);
   /* Set the brightness to a medium values */
-  lc.setIntensity(0,15);
+  lc.setIntensity(0,7);
   /* and clear the display */
   lc.clearDisplay(0);
   
 }
 
-void BigDisplay_WriteText(char* text)
-{
-  char c;
-  for (int i = 0; i < 8; i++) 
-  {
-        c = text[i];
-        if (c >= ' ' && c <= 'Z') 
-        {
-            if (c == '.') 
-            { 
-              lc.setRow(0,i,(int)128);
-            }
-            else 
-            {
-               
-                lc.setRow(0,i,Alphanumeric[c -32]);
-            }
-        }
-}
-   
-}
 void BigDisplay_Random()
 {
   int rnd = random(0,127); 
@@ -168,13 +144,12 @@ void setup()
 {
   //Pin setzetn
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(PCBUTTON,OUTPUT);
-  pinMode(POWER,OUTPUT);
-  pinMode(POWERSWITCH,INPUT);
-  pinMode(EMCSTOP,INPUT);
+ 
   SmallDisplay_Init();
   BigDisplay_Init();
+  
   Serial.begin(9600);
+  Serial.print("rubens2\n");
 }
 
 
@@ -194,11 +169,19 @@ void displayProcess()
 {
   switch(iStep)
   {
-    case 0:
+    case 0: //boot
     {
-      char txt[9] = "booting";
-      BigDisplay_WriteText(txt);
-      iStep = 3000;
+      char txt[5] = "boot";
+      matrix.println(txt);
+      matrix.writeDisplay();
+        
+      lc.setRow(0,rowCount,1);
+      rowCount++;
+      if(rowCount >= 8)
+      {
+        rowCount = 0;
+        lc.clearDisplay(0);
+      }
       break;
     }
     case 10: //running init
@@ -213,50 +196,88 @@ void displayProcess()
         SmallDisplay_Random();
         BigDisplay_Random();
         break;
+    } 
+    case 30: //Emergency
+    {
+      char txt[5] = "Err";
+      matrix.clear();
+      lc.clearDisplay(0);
+
+      matrix.println(txt);
+      matrix.writeDisplay();
+      lc.setChar(0, 7, 'E', false);
+      iStep = 3000;
+      break;
+    }
+    case 40: //Emergency
+    {
+      matrix.clear();
+      lc.clearDisplay(0);
+
+      matrix.println(8888);
+      matrix.writeDisplay();
+      lc.setChar(0, 7, '8', false);
+      lc.setChar(0, 6, '8', false);
+      lc.setChar(0, 5, '8', false);
+      lc.setChar(0, 4, '8', false);
+      lc.setChar(0, 3, '8', false);
+      lc.setChar(0, 2, '8', false);
+      lc.setChar(0, 1, '8', false);
+      lc.setChar(0, 0, '8', false);
+      iStep = 3000;
+      break;
+    }
+    case 2000: //clear
+    {
+      matrix.clear();
+      matrix.writeDisplay();
+      lc.clearDisplay(0);
+      iStep = 3000;
+      break;
     }
   }
 }
 void loop() 
 {
-  int tickCount = 0;
-  int lastVal = 0;
-  
   if((tickCount%25) == 0)
   {
       displayProcess();
+      digitalWrite(LED_BUILTIN,toggle);
+      toggle = ~toggle;
   }
-  if((tickCount%2) == 0)
+  if((tickCount%20) == 0)
   {
-      int val = analogRead(PIN11);
-      val = 5 /1024*val;
-      if(lastVal = val)
+      float val = (float)analogRead(A1);
+      val = (float)5000 / (float)1023 * val;
+      if(lastVal != val)
       {
         Serial.print("POT:");
-        Serial.print(val,16);
+        Serial.print((int)val,10);
         Serial.print("\n");
       }
       lastVal = val;
+      
   }
   if(Serial.available())
   {
     size_t size = 0;
-    size = Serial.readBytesUntil('\n',rxData,9);
+    size = Serial.readBytesUntil('\n',rxData,100);
+   
     if(strncmp(rxData,"RUN:",4) == 0)
     {
        iStep = 10;
     }
     else if(strncmp(rxData,"STOP:",5) == 0)
     {
-       iStep = 3000;
-       matrix.clear();
-      lc.clearDisplay(0);
+      iStep = 2000;
     }
-    else if(strncmp(rxData,"TXT:",4) == 0)
+    else if(strncmp(rxData,"EMC:",4) == 0)
     {
-       iStep = 3000;
-       matrix.clear();
-      lc.clearDisplay(0);
-      BigDisplay_WriteText(rxData + 4);
+       iStep = 30;
+    }
+     else if(strncmp(rxData,"LC:",3) == 0)
+    {
+       iStep = 40;
     }
   }
   tickCount++;

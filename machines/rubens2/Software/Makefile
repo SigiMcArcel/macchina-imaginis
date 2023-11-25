@@ -10,7 +10,7 @@ LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lm
 SOURCES=main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
-EXEOUT=Rubens2
+EXEOUT=rubens
 
 
 .cpp.o:

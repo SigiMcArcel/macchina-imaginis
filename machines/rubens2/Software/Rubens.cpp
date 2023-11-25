@@ -9,12 +9,12 @@ void Rubens::ButtonDown(const std::string& name)
 	{
 		_StartProgram = false;
 		_ButtonLampManager.emergencyStopAll(true);
-		_Leonardo.text("Emergency stop");
+		_Leonardo.emergency();
 	}
 	else if(name == "lampControl")
 	{
 		_ButtonLampManager.lampControlAll(true);
-		_Leonardo.text("Lamp control");
+		_Leonardo.lampControl();
 	}
 	else if  (name == "program")
 	{
@@ -23,10 +23,10 @@ void Rubens::ButtonDown(const std::string& name)
 	}
 	else
 	{
-
-
+		;
 	}
 }
+
 void Rubens::ButtonUp(const std::string& name)
 {
 	if (name == "emergencyStop")
@@ -47,10 +47,10 @@ void Rubens::ButtonUp(const std::string& name)
 	}
 	else
 	{
-
-
+		;
 	}
 }
+
 void Rubens::ButtonClick(const std::string& name)
 {
 
@@ -62,57 +62,63 @@ void Rubens::ButtonToggle(bool state, const std::string& name)
 
 void Rubens::addProgrammEntry(const std::string& name, Cmd_e cmd)
 {
+
 	RubensProgramm p(name, cmd);
 	_ProgramList.push_back(p);
 }
 
 void rubens2::Rubens::potValueChanged(int val)
 {
-	_Volume.setVolume(val);
+	float percent = (float)100 / (float)5000 * val;
+	_Volume.setVolume((int)percent);
 }
 
 void Rubens::createProgramm()
 {
-	addProgrammEntry("A7", Cmd_e::on);
-	addProgrammEntry("A7", Cmd_e::pause);
-	addProgrammEntry("A7", Cmd_e::off);
-	addProgrammEntry("A8", Cmd_e::on);
-	addProgrammEntry("A8", Cmd_e::pause);
-	addProgrammEntry("A8", Cmd_e::off);
-	addProgrammEntry("A6", Cmd_e::on);
-	addProgrammEntry("A6", Cmd_e::pause);
-
-	addProgrammEntry("A6", Cmd_e::off);
-	addProgrammEntry("A5", Cmd_e::on);
-	addProgrammEntry("A5", Cmd_e::pause);
-	addProgrammEntry("A5", Cmd_e::off);
-	addProgrammEntry("A14", Cmd_e::on);
-	addProgrammEntry("A14", Cmd_e::pause);
-	addProgrammEntry("A15", Cmd_e::off);
-	addProgrammEntry("A15", Cmd_e::pause);
-	addProgrammEntry("A15", Cmd_e::off);
-	addProgrammEntry("A22", Cmd_e::on);
-	addProgrammEntry("A22", Cmd_e::pause);
-
-	addProgrammEntry("A22", Cmd_e::off);
-	addProgrammEntry("A24", Cmd_e::on);
-	addProgrammEntry("A24", Cmd_e::pause);
-	addProgrammEntry("A24", Cmd_e::off);
-	addProgrammEntry("A31", Cmd_e::on);
-	addProgrammEntry("A30", Cmd_e::on);
-	addProgrammEntry("A14", Cmd_e::pause);
-	addProgrammEntry("A31", Cmd_e::off);
-	addProgrammEntry("A30", Cmd_e::off);
-	addProgrammEntry("A34", Cmd_e::on);
-	addProgrammEntry("A30", Cmd_e::pause);
-	addProgrammEntry("A34", Cmd_e::off);
-	addProgrammEntry("A36", Cmd_e::on);
-	addProgrammEntry("A38", Cmd_e::on);
-	addProgrammEntry("A30", Cmd_e::pause);
-	addProgrammEntry("A38", Cmd_e::off);
-	addProgrammEntry("A44", Cmd_e::on);
-	addProgrammEntry("A30", Cmd_e::pause);
-	addProgrammEntry("A44", Cmd_e::off);
+	addProgrammEntry("A7_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A7_1", Cmd_e::off);
+	addProgrammEntry("A8_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A8_1", Cmd_e::off);
+	addProgrammEntry("A6_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A6_1", Cmd_e::off);
+	addProgrammEntry("A5_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A5_1", Cmd_e::off);
+	addProgrammEntry("A14_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A14_1", Cmd_e::off);
+	addProgrammEntry("A15_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A15_1", Cmd_e::off);
+	addProgrammEntry("A16_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A16_1", Cmd_e::off);
+	addProgrammEntry("A22_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A22_1", Cmd_e::off);
+	addProgrammEntry("A24_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A24_1", Cmd_e::off);
+	addProgrammEntry("A31_1", Cmd_e::on);
+	addProgrammEntry("A30_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A31_1", Cmd_e::off);
+	addProgrammEntry("A30_1", Cmd_e::off);
+	addProgrammEntry("A34_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A34_1", Cmd_e::off);
+	addProgrammEntry("A36_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A36_1", Cmd_e::off);
+	addProgrammEntry("A38_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A38_1", Cmd_e::off);
+	addProgrammEntry("A44_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A44_1", Cmd_e::off);
 }
 
 // Geerbt über EventListener
@@ -174,7 +180,7 @@ void Rubens::createAndAddButtonLamp(
 		buttonType,
 		false,
 		_WavePath,
-		false);
+		loop);
 
 	_ButtonLamps.push_back(lamp);
 	_ButtonLampManager.registerAll(lamp, lamp);
@@ -251,52 +257,53 @@ void Rubens::createComponents()
 	createAndAddButtonLamp("P34", "E49", "A49", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true);
 	createAndAddButtonLamp("P35", "E50", "A50", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true);
 	createAndAddButtonLamp("A17", "E51", "A51", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
-	createAndAddButtonLamp("A11", "E51", "A51", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
+	createAndAddButtonLamp("A11", "E52", "A52", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
 
 
 	//lamps
-	createAndAddLamps("A2", "A2");
-	createAndAddLamps("A3", "A3");
-	createAndAddLamps("A4", "A4");
-	createAndAddLamps("A5", "A5");
-	createAndAddLamps("A6", "A6");
-	createAndAddLamps("A7", "A7");
-	createAndAddLamps("A8", "A8");
-	createAndAddLamps("A9", "A9");
-	createAndAddLamps("A10", "A10");
-	createAndAddLamps("A11", "A11");
-	createAndAddLamps("A12", "A12");
-	createAndAddLamps("A13", "A13");
-	createAndAddLamps("A14", "A14");
-	createAndAddLamps("A15", "A15");
-	createAndAddLamps("A16", "A16");
-	createAndAddLamps("A17", "A17");
-	createAndAddLamps("A18", "A18");
-	createAndAddLamps("A19", "A19");
-	createAndAddLamps("A20", "A20");
-	createAndAddLamps("A21", "A21");
-	createAndAddLamps("A22", "A22");
-	createAndAddLamps("A23", "A23");
-	createAndAddLamps("A24", "A24");
-	createAndAddLamps("A25", "A25");
-	createAndAddLamps("A26", "A26");
-	createAndAddLamps("A27", "A27");
-	createAndAddLamps("A28", "A28");
-	createAndAddLamps("A29", "A29");
-	createAndAddLamps("A30", "A30");
-	createAndAddLamps("A31", "A31");
-	createAndAddLamps("A32", "A32");
-	createAndAddLamps("A33", "A33");
-	createAndAddLamps("A34", "A34");
-	createAndAddLamps("A35", "A35");
-	createAndAddLamps("A36", "A36");
-	createAndAddLamps("A37", "A37");
-	createAndAddLamps("A38", "A38");
-	createAndAddLamps("A39", "A39");
-	createAndAddLamps("A40", "A40");
-	createAndAddLamps("A41", "A41");
-	createAndAddLamps("A42", "A42");
-	createAndAddLamps("A43", "A43");
+	createAndAddLamps("A1_1", "A1");
+	createAndAddLamps("A2_1", "A2");
+	createAndAddLamps("A3_1", "A3");
+	createAndAddLamps("A4_1", "A4");
+	createAndAddLamps("A5_1", "A5");
+	createAndAddLamps("A6_1", "A6");
+	createAndAddLamps("A7_1", "A7");
+	createAndAddLamps("A8_1", "A8");
+	createAndAddLamps("A9_1", "A9");
+	createAndAddLamps("A10_1", "A10");
+	createAndAddLamps("A11_1", "A11");
+	createAndAddLamps("A12_1", "A12");
+	createAndAddLamps("A13_1", "A13");
+	createAndAddLamps("A14_1", "A14");
+	createAndAddLamps("A15_1", "A15");
+	createAndAddLamps("A16_1", "A16");
+	createAndAddLamps("A17_1", "A17");
+	createAndAddLamps("A18_1", "A18");
+	createAndAddLamps("A19_1", "A19");
+	createAndAddLamps("A20_1", "A20");
+	createAndAddLamps("A21_1", "A21");
+	createAndAddLamps("A22_1", "A22");
+	createAndAddLamps("A23_1", "A23");
+	createAndAddLamps("A24_1", "A24");
+	createAndAddLamps("A25_1", "A25");
+	createAndAddLamps("A26_1", "A26");
+	createAndAddLamps("A27_1", "A27");
+	createAndAddLamps("A28_1", "A28");
+	createAndAddLamps("A29_1", "A29");
+	createAndAddLamps("A30_1", "A30");
+	createAndAddLamps("A31_1", "A31");
+	createAndAddLamps("A32_1", "A32");
+	createAndAddLamps("A33_1", "A33");
+	createAndAddLamps("A34_1", "A34");
+	createAndAddLamps("A35_1", "A35");
+	createAndAddLamps("A36_1", "A36");
+	createAndAddLamps("A37_1", "A37");
+	createAndAddLamps("A38_1", "A38");
+	createAndAddLamps("A39_1", "A39");
+	createAndAddLamps("A40_1", "A40");
+	createAndAddLamps("A41_1", "A41");
+	createAndAddLamps("A42_1", "A42");
+	createAndAddLamps("A43_1", "A43");
 
 	//notaus
 	mimodule::ModuleChannel* inchannel = _DoepferInputChannel0.getChannel("E47");

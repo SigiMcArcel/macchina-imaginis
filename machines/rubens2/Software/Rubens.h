@@ -98,7 +98,7 @@ public:
 	,_WavePath(wavePath)
 	,_Timer("Program",this)
 	, _Volume(20)
-	,_Leonardo("/dev/ttyAMA0",this)
+	,_Leonardo("/dev/ttyACM0",this)
 	, _StartProgram(false)
 	, _ProgramStep(0)
 	{
@@ -108,6 +108,7 @@ public:
 		createComponents();
 		createProgramm();
 		_Leonardo.run();
+		_ButtonLampManager.LampOn("A37_1");
 	}
 
 

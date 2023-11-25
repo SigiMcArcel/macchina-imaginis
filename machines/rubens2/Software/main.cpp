@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
     {
 
         if (::strcmp(argv[1], "-d") == 0) {
-            printf("miwoodenmachine daemonize\n");
+            printf("Rubens2 daemonize\n");
             if (::daemon(1, 1)) {
                 perror("Unable to daemonize");
                 return 1;
