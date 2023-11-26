@@ -115,8 +115,6 @@ public:
 	void start()
 	{
 		_ModuleManager.start();
-		_Timer.Start(250);
-
 	}
 
 	void stop()

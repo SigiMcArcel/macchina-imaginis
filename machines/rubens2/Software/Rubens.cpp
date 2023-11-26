@@ -20,6 +20,7 @@ void Rubens::ButtonDown(const std::string& name)
 	{
 		_ProgramStep = 0;
 		_StartProgram = true;
+		_Timer.Start(200);
 	}
 	else
 	{
@@ -42,8 +43,13 @@ void Rubens::ButtonUp(const std::string& name)
 	}
 	else if (name == "program")
 	{
+		_Timer.Stop();
 		_ProgramStep = 0;
 		_StartProgram = false;
+		for (int i = 0; i < _ProgramList.size(); i++)
+		{
+			_ButtonLampManager.LampOff(_ProgramList[i]._Name);
+		}
 	}
 	else
 	{
@@ -62,7 +68,6 @@ void Rubens::ButtonToggle(bool state, const std::string& name)
 
 void Rubens::addProgrammEntry(const std::string& name, Cmd_e cmd)
 {
-
 	RubensProgramm p(name, cmd);
 	_ProgramList.push_back(p);
 }
@@ -119,6 +124,83 @@ void Rubens::createProgramm()
 	addProgrammEntry("A44_1", Cmd_e::on);
 	addProgrammEntry("", Cmd_e::pause);
 	addProgrammEntry("A44_1", Cmd_e::off);
+
+	addProgrammEntry("", Cmd_e::pause);
+
+	addProgrammEntry("A3_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A3_1", Cmd_e::off);
+	addProgrammEntry("A4_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A4_1", Cmd_e::off);
+	addProgrammEntry("A10_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A10_1", Cmd_e::off);
+	addProgrammEntry("A13_1", Cmd_e::on);
+	addProgrammEntry("A12_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A13_1", Cmd_e::off);
+	addProgrammEntry("A12_1", Cmd_e::off);
+	addProgrammEntry("A20_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A20_1", Cmd_e::off);
+	addProgrammEntry("A21_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A21_1", Cmd_e::off);
+	addProgrammEntry("A27_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A27_1", Cmd_e::off);
+	addProgrammEntry("A29_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A29_1", Cmd_e::off);
+	addProgrammEntry("A33_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A33_1", Cmd_e::off);
+	addProgrammEntry("A38_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A38_1", Cmd_e::off);
+	addProgrammEntry("A42_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A42_1", Cmd_e::off);
+	addProgrammEntry("A43_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A43_1", Cmd_e::off);
+
+	addProgrammEntry("", Cmd_e::pause);
+
+	addProgrammEntry("A2_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A2_1", Cmd_e::off);
+	addProgrammEntry("A11_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A11_1", Cmd_e::off);
+	addProgrammEntry("A17_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A17_1", Cmd_e::off);
+	addProgrammEntry("A18_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A18_1", Cmd_e::off);
+	addProgrammEntry("A19_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A19_1", Cmd_e::off);
+	addProgrammEntry("A26_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A26_1", Cmd_e::off);
+	addProgrammEntry("A28_1", Cmd_e::on);
+	addProgrammEntry("A25_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A28_1", Cmd_e::off);
+	addProgrammEntry("A25_1", Cmd_e::off);
+	addProgrammEntry("A32_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A32_1", Cmd_e::off);
+	addProgrammEntry("A35_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A35_1", Cmd_e::off);
+	addProgrammEntry("A40_1", Cmd_e::on);
+	addProgrammEntry("", Cmd_e::pause);
+	addProgrammEntry("A40_1", Cmd_e::off);
+	addProgrammEntry("", Cmd_e::pause);
 }
 
 // Geerbt über EventListener
@@ -147,6 +229,7 @@ void Rubens::eventOccured(void* sender, const std::string& name)
 		}
 		_ProgramStep++;
 	}
+	
 }
 
 
