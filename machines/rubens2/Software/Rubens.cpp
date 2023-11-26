@@ -46,7 +46,7 @@ void Rubens::ButtonUp(const std::string& name)
 		_Timer.Stop();
 		_ProgramStep = 0;
 		_StartProgram = false;
-		for (int i = 0; i < _ProgramList.size(); i++)
+		for (unsigned int i = 0; i < _ProgramList.size(); i++)
 		{
 			_ButtonLampManager.LampOff(_ProgramList[i]._Name);
 		}
@@ -74,7 +74,7 @@ void Rubens::addProgrammEntry(const std::string& name, Cmd_e cmd)
 
 void rubens2::Rubens::potValueChanged(int val)
 {
-	float percent = (float)100 / (float)5000 * val;
+	float percent = (float)100 / (float)5000 * (float)val;
 	_Volume.setVolume((int)percent);
 }
 

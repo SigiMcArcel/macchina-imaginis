@@ -5,7 +5,8 @@
 int main(int argc, char* argv[])
 {
     const std::string _WavePath = std::string("/home/root/sounds");
-    rubens2::Rubens rubens(_WavePath);
+   
+    fprintf(stderr, "Rubens2\n");
 
     int handle = -1;
     if (argc == 2)
@@ -20,33 +21,32 @@ int main(int argc, char* argv[])
         }
     }
 
-    fprintf(stderr,"Rubens2\n");
-    
     handle = ::open("/dev/sda1", O_RDWR);
     if (handle == -1)
     {
-        printf("miwoodenmachine failed -> no usb\n");
+        printf("rubens failed -> no usb\n");
     }
     ::close(handle);
     if (mount("/dev/sda1", "/home/root/sounds", "vfat", MS_NOATIME, NULL)) {
         if (errno == EBUSY) {
-            printf("miwoodenmachine Mountpoint busy\n");
+            printf("rubens Mountpoint busy\n");
             handle = ::open("/dev/sda1", O_RDWR);
             if (handle == -1)
             {
-                printf("miwoodenmachine failed -> no usb\n");
+                printf("rubens failed -> no usb\n");
                 return 1;
             }
         }
         else {
-            printf("miwoodenmachine Mount error: %s\n", strerror(errno));
+            printf("rubens Mount error: %s\n", strerror(errno));
             return 1;
         }
     }
     else {
-        printf("miwoodenmachine Mount successful\n");
+        printf("rubens Mount successful\n");
     }
    
+    rubens2::Rubens rubens(_WavePath);
     rubens.start();
 
     while (true)
