@@ -36,7 +36,9 @@ namespace rubens2
 	};
 
 
-class Rubens :public micomponents::miButtonEventInterface, public miutils::EventListener, public Leonardo::PotChangedEvent
+class Rubens :public micomponents::miButtonEventInterface, 
+	public miutils::EventListener, 
+	public Leonardo::PotChangedEvent
 {
 	
 private:
@@ -91,7 +93,7 @@ private:
 public:
 	Rubens(const std::string& wavePath)
 	:_ButtonLampManager()
-	, _ModuleManager(100)
+	,_ModuleManager(100)
 	,_DoepferInputChannel0(0,"_DoepferInputChannel0")
 	,_DoepferOutputChannel0(0, "_DoepferOutputChannel0")
 	,_DoepferOutputChannel1(1, "_DoepferOutputChannel1")
