@@ -27,8 +27,10 @@ class QuadratMachine
     }LighGameState;
 
 private:
-    const int _ComponentManagerRootIntervall = 5;
-    const int _ComponentIntervall = 10;
+    const int _ModuleManagerInterval = 20;
+    const int _ComponentManagerIntervall = 20;
+    const int _LedStripIntervallIntervall = 100;
+   
     mimodule::ModuleManager _ModuleManager;
     mimodule::ModuleGecon32Input _GeconIn1;
     mimodule::ModuleGecon32Input _GeconIn2;
@@ -54,10 +56,11 @@ private:
     LighGameState _LighGameState;
     int _SegmentNumber;
    
-    const int  MAX_LED_RED = 129;
+    const int  MAX_LED_RED = 130;
     const int  SMOOTHED_LED = 129;
     const int  MAX_LED_YELLOW = 132;
     const int  MAX_LED_BLUE = 148;
+
     //To do Would be nice to give a name
     const std::vector<mimodule::ModuleMiRpiGpioConfiguration> _PhoneJackConfiguration =
     {
@@ -81,7 +84,8 @@ private:
         const std::string& outputChannelName,
         micomponents::ButtonType buttonType,
         micomponents::LampType lampType,
-        bool loop
+        bool loop,
+        miButtonEventInterface* buttonEvent = nullptr
     );
 
     void createAndAddButtonLamp(
@@ -108,7 +112,7 @@ private:
     
 public:
     QuadratMachine(const std::string& wavePath)
-        : _ModuleManager(10)
+        : _ModuleManager(_ModuleManagerInterval)
         ,_GeconIn1("/dev/ttyUSB0", 1, "geconIn1")
         ,_GeconIn2("/dev/ttyUSB0", 2, "geconIn2")
         ,_GeconOut3("/dev/ttyUSB0", 3, "geconOut3")
@@ -125,10 +129,10 @@ public:
                 }
             }
     )
-        ,_Sevenofnine("/dev/spidev0.0", "sevenofnine")
-        ,_ModulVolume(0x48, 0.1, "Volume")
+        , _Sevenofnine("/dev/spidev0.0", "sevenofnine")
+        , _ModulVolume(0x48, 0.1, "Volume")
 
-        , _MiComponentManager(5)
+        , _MiComponentManager(_ComponentManagerIntervall)
         , _WavePath(wavePath)
         , _Audio(std::string("plug:dmix0"), _WavePath)
         , _Timer("LightGame", this)
@@ -160,11 +164,13 @@ public:
 
     virtual void PhoneNumberchanged(int number)
     {
-        _MiSevenSegment->setSegment(_SegmentNumber, number);
         _SegmentNumber++;
-        if (_SegmentNumber > 9)
+        _MiSevenSegment->setSegment(_SegmentNumber, number);
+        
+        if (_SegmentNumber > 8)
         {
             _SegmentNumber = 0;
+            _MiSevenSegment->setBlank();
         }
     }
 

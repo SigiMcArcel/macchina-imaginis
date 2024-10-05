@@ -8,10 +8,12 @@ void QuadratMachine::ButtonDown(const std::string& name)
 	{
 		_MiComponentManager.disableInputsAll(true);
 		_MiComponentManager.disableOutputsAll(true);
+		_MiComponentManager.disableOutputs("Error", false);
+		_MiComponentManager.LampOn("Error");
 	}
 	else if (name == "lampCheck")
 	{
-		_MiComponentManager.lampControlAll(true);
+		_MiComponentManager.checkAll(true);
 	}
 	else if (name == "ledStripYellowOnOff_Button")
 	{
@@ -25,9 +27,13 @@ void QuadratMachine::ButtonDown(const std::string& name)
 	{
 		_MiLedStripRed->startLED();
 	}
+	else if (name == "s18p18_Button")
+	{
+		_MiLedStripRed->startSmoothingLed(true);
+	}
 	else if (name == "error_Button")
 	{
-		_MiComponentManager.lampControlAll(true);
+		_MiComponentManager.checkAll(true);
 	}
 	if (name == "lightgame1")
 	{
@@ -57,10 +63,11 @@ void QuadratMachine::ButtonUp(const std::string& name)
 	{
 		_MiComponentManager.disableInputsAll(false);
 		_MiComponentManager.disableOutputsAll(false);
+		_MiComponentManager.LampOff("Error");
 	}
 	else if (name == "lampCheck")
 	{
-		_MiComponentManager.lampControlAll(false);
+		_MiComponentManager.checkAll(false);
 	}
 	else if (name == "ledStripYellowOnOff_Button")
 	{
@@ -74,9 +81,9 @@ void QuadratMachine::ButtonUp(const std::string& name)
 	{
 		_MiLedStripRed->stopLED();
 	}
-	else if (name == "error_Button")
+	else if (name == "s18p18_Button")
 	{
-		_MiComponentManager.lampControlAll(true);
+		_MiLedStripRed->startSmoothingLed(false);
 	}
 	if (name == "lightgame1")
 	{
@@ -108,12 +115,12 @@ void QuadratMachine::ButtonClick(const std::string& name)
 		_MiLedStripRed->stepMode();
 	}
 }
+
 void QuadratMachine::ButtonToggle(bool state, const std::string& name)
 {
 	printf("QuadratMachine::ButtonClick %s\n", name.c_str());
 }
 
-// Geerbt über EventListener
 void QuadratMachine::eventOccured(void* sender, const std::string& name)
 {
 	if (_LighGameState == LighGameState::off)
@@ -128,7 +135,6 @@ void QuadratMachine::eventOccured(void* sender, const std::string& name)
 	{
 
 	}
-
 }
 
 void QuadratMachine::createAndAddWaveButtonLamp(
@@ -137,7 +143,8 @@ void QuadratMachine::createAndAddWaveButtonLamp(
 	const std::string& outputChannelName,
 	micomponents::ButtonType buttonType,
 	micomponents::LampType lampType,
-	bool loop
+	bool loop,
+	miButtonEventInterface* buttonEvent
 )
 {
 	mimodule::ModuleChannel* inchannel = nullptr;
@@ -145,10 +152,7 @@ void QuadratMachine::createAndAddWaveButtonLamp(
 
 	int InModulAdr = getModulAddressFromChannelName(inputChannelName);
 	int OutModulAdr = getModulAddressFromChannelName(outputChannelName);
-	if ((InModulAdr == -1) || (OutModulAdr == -1))
-	{
-		return;
-	}
+	
 	if (InModulAdr == _GeconIn1.getAddress())
 	{
 		inchannel = _GeconIn1.getChannel(inputChannelName);
@@ -169,14 +173,14 @@ void QuadratMachine::createAndAddWaveButtonLamp(
 	if (inchannel == nullptr)
 	{
 		printf("createAndAddLamps invalid channel %s\n", inputChannelName.c_str());
-		return;
 	}
 	
 	if (outchannel == nullptr)
 	{
 		printf("createAndAddLamps invalid channel %s\n", outputChannelName.c_str());
-		return;
+		
 	}
+
 	_MiComponentManager.registerComponent<micomponents::miPlayWaveButtonLamp>(
 		wavename,
 		10,
@@ -185,6 +189,7 @@ void QuadratMachine::createAndAddWaveButtonLamp(
 		inchannel,
 		outchannel,
 		buttonType,
+		buttonEvent,
 		_Audio,
 		false,
 		loop
@@ -204,10 +209,7 @@ void QuadratMachine::createAndAddButtonLamp(
 
 	int InModulAdr = getModulAddressFromChannelName(inputChannelName);
 	int OutModulAdr = getModulAddressFromChannelName(outputChannelName);
-	if ((InModulAdr == -1) || (OutModulAdr == -1))
-	{
-		return;
-	}
+	
 	if (InModulAdr == _GeconIn1.getAddress())
 	{
 		inchannel = _GeconIn1.getChannel(inputChannelName);
@@ -247,8 +249,6 @@ void QuadratMachine::createAndAddButtonLamp(
 		this,
 		buttonType,
 		false);
-	
-	
 }
 
 void QuadratMachine::createAndAddLamp(
@@ -284,7 +284,6 @@ void QuadratMachine::createAndAddLamp(
 	250,
 	outchannel);
 }
-
 
 void QuadratMachine::createAndAddButton(
 	const std::string& name,
@@ -335,7 +334,7 @@ void QuadratMachine::createComponents()
 	createAndAddWaveButtonLamp("s15p15", "E1.14", "A3.14", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
 	createAndAddWaveButtonLamp("s16p16", "E1.15", "A3.15", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
 	createAndAddWaveButtonLamp("s17p17", "E1.16", "A3.16", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
-	createAndAddWaveButtonLamp("s18p18", "E1.17", "", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true);
+	createAndAddWaveButtonLamp("s18p18", "E1.17", "", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true,this);
 	createAndAddWaveButtonLamp("s19p19", "E1.18", "A3.18", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
 	createAndAddWaveButtonLamp("s20p20", "E1.19", "A3.19", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true);
 	createAndAddWaveButtonLamp("s21p21", "E1.20", "A3.20", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
@@ -356,9 +355,9 @@ void QuadratMachine::createComponents()
 	createAndAddButton("lightgame1", "E2.5");
 	createAndAddButton("lightgame2", "E2.6");
 	createAndAddButtonLamp("emergencyStop", "E2.7", "A4.7",micomponents::ButtonType::Switch, micomponents::LampType::Flash);
-	createAndAddButton("ledStripeModeYellow", "E2.9");
+	createAndAddButton("ledStripeModeYellow", "E2.11");
 	createAndAddButton("ledStripeModeBlue", "E2.10");
-	createAndAddButton("ledStripeModeRed", "E2.11");
+	createAndAddButton("ledStripeModeRed", "E2.9");
 	createAndAddButton("lampCheck", "E2.13");
 	createAndAddButtonLamp("ledStripYellowOnOff", "E2.14", "A4.14", micomponents::ButtonType::Switch, micomponents::LampType::Fix);
 	createAndAddButtonLamp("ledStripBlueOnOff", "E2.15", "A4.15", micomponents::ButtonType::Switch, micomponents::LampType::Fix);
@@ -368,15 +367,19 @@ void QuadratMachine::createComponents()
 	_MiComponentManager.registerComponent<micomponents::miPhoneNumber>("dial", 5, _PhoneNumber.getChannel("PhoneNumber"), this);
 	_MiSevenSegment = _MiComponentManager.getComponent<micomponents::miSevenSegment>("seven");
 
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripYellow", MAX_LED_YELLOW, _ComponentIntervall, "/dev/ttyACM1");
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripBlue", MAX_LED_BLUE, _ComponentIntervall, "/dev/ttyACM2");
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripRed", MAX_LED_RED + 1, _ComponentIntervall, "/dev/ttyACM0");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripYellow", MAX_LED_YELLOW, _LedStripIntervallIntervall,-1, "/dev/ttyACM1");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripBlue", MAX_LED_BLUE, _LedStripIntervallIntervall, -1,"/dev/ttyACM2");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripRed", MAX_LED_RED, _LedStripIntervallIntervall, SMOOTHED_LED,"/dev/ttyACM0");
 	_MiLedStripYellow = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripYellow");
 	_MiLedStripBlue = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripBlue");
 	_MiLedStripRed = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripRed");
+	_MiLedStripYellow->setMode(micomponents::LedStripMode::running);
+	_MiLedStripBlue->setMode(micomponents::LedStripMode::running);
+	_MiLedStripRed->setMode(micomponents::LedStripMode::running);
+
 	_MiComponentManager.registerComponent<micomponents::miAudio>(
 		"miAudio",
-		_ComponentIntervall,
+		_ComponentManagerIntervall,
 		_ModulVolume.getChannel("Potentiometer"),
 		_PhoneJack.getChannel("GPIO5"),
 		_Audio,
