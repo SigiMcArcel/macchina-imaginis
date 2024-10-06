@@ -137,6 +137,18 @@ void QuadratMachine::eventOccured(void* sender, const std::string& name)
 	}
 }
 
+void QuadratMachine::PhoneNumberchanged(int number)
+{
+	_SegmentNumber++;
+	_MiSevenSegment->setSegment(_SegmentNumber, number);
+
+	if (_SegmentNumber > 8)
+	{
+		_SegmentNumber = 0;
+		_MiSevenSegment->reset();
+	}
+}
+
 void QuadratMachine::createAndAddWaveButtonLamp(
 	const std::string& wavename,
 	const std::string& inputChannelName,
@@ -367,9 +379,9 @@ void QuadratMachine::createComponents()
 	_MiComponentManager.registerComponent<micomponents::miPhoneNumber>("dial", 5, _PhoneNumber.getChannel("PhoneNumber"), this);
 	_MiSevenSegment = _MiComponentManager.getComponent<micomponents::miSevenSegment>("seven");
 
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripYellow", MAX_LED_YELLOW, _LedStripIntervallIntervall,-1, "/dev/ttyACM1");
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripBlue", MAX_LED_BLUE, _LedStripIntervallIntervall, -1,"/dev/ttyACM2");
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripRed", MAX_LED_RED, _LedStripIntervallIntervall, SMOOTHED_LED,"/dev/ttyACM0");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripYellow", MAX_LED_YELLOW, _LedStripIntervallIntervall,-1, _SmoothLedIntervall, "/dev/ttyACM1");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripBlue", MAX_LED_BLUE, _LedStripIntervallIntervall, -1, _SmoothLedIntervall,"/dev/ttyACM2");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripRed", MAX_LED_RED, _LedStripIntervallIntervall, SMOOTHED_LED, _SmoothLedIntervall,"/dev/ttyACM0");
 	_MiLedStripYellow = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripYellow");
 	_MiLedStripBlue = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripBlue");
 	_MiLedStripRed = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripRed");
@@ -402,4 +414,57 @@ int QuadratMachine::getModulAddressFromChannelName(const std::string& input)
 		// Wenn kein Punkt gefunden wurde, gib den gesamten String zurück
 		return -1;
 	}
+}
+
+void QuadratMachine::start()
+{
+	_ModuleManager.start();
+	_MiComponentManager.start();
+}
+
+void QuadratMachine::stop()
+{
+	_ModuleManager.stop();
+}
+
+int QuadratMachine::getValueFromIniFile(const std::string& filePath, const std::string& key) {
+	std::ifstream iniFile(filePath);
+	if (!iniFile.is_open()) {
+		std::cerr << "Fehler: Konnte die Datei " << filePath << " nicht öffnen." << std::endl;
+		return -1; // oder eine andere geeignete Fehlerkennzeichnung
+	}
+
+	std::string line;
+	while (std::getline(iniFile, line)) {
+		// Trim leading and trailing whitespace
+		line.erase(0, line.find_first_not_of(" \t\n\r"));
+		line.erase(line.find_last_not_of(" \t\n\r") + 1);
+
+		// Überspringe Kommentare oder leere Zeilen
+		if (line.empty() || line[0] == ';' || line[0] == '#') {
+			continue;
+		}
+
+		// Suche nach dem Schlüssel (Key)
+		if (line.find(key + "=") == 0) {
+			// Extrahiere den Wert hinter dem "="
+			std::string valueStr = line.substr(line.find("=") + 1);
+
+			// Konvertiere den String in eine Zahl
+			try {
+				int value = std::stoi(valueStr);
+				iniFile.close();
+				return value;
+			}
+			catch (const std::invalid_argument& e) {
+				std::cerr << "Fehler: Ungültiger Wert für den Schlüssel: " << key << std::endl;
+				iniFile.close();
+				return -1;
+			}
+		}
+	}
+
+	iniFile.close();
+	std::cerr << "Fehler: Schlüssel " << key << " nicht gefunden." << std::endl;
+	return -1; // oder eine andere Fehlerkennzeichnung, wenn der Schlüssel nicht gefunden wurde
 }

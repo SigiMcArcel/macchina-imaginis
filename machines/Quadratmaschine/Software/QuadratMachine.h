@@ -27,10 +27,22 @@ class QuadratMachine
     }LighGameState;
 
 private:
-    const int _ModuleManagerInterval = 20;
-    const int _ComponentManagerIntervall = 20;
-    const int _LedStripIntervallIntervall = 100;
-   
+    /*int _ModuleManagerInterval = 50;
+    int _ComponentManagerIntervall = 5;
+    int _LedStripIntervallIntervall = 100;*/
+
+
+    int _ModuleManagerInterval; //50
+    int _PhoneNumberModuleIntervall; //5
+    int _SevenSegmentModuleIntervall; //20
+    int _ModuleVolumeIntervall;
+    int _PhoneJackModuleIntervall;
+
+    int _ComponentManagerIntervall; //5
+    int _LedStripIntervallIntervall; //100
+    int _SmoothLedIntervall; // 100
+    int _LightGameIntervall; // 100
+
     mimodule::ModuleManager _ModuleManager;
     mimodule::ModuleGecon32Input _GeconIn1;
     mimodule::ModuleGecon32Input _GeconIn2;
@@ -107,17 +119,19 @@ private:
         const std::string& inputChannelName
     );
     void createComponents();
+    int getModulAddressFromChannelName(const std::string& input);
+    void readIniFile(const std::string& filePath,const std::string& key);
 
-   int getModulAddressFromChannelName(const std::string& input);
+    virtual void PhoneNumberchanged(int number);
     
 public:
     QuadratMachine(const std::string& wavePath)
         : _ModuleManager(_ModuleManagerInterval)
-        ,_GeconIn1("/dev/ttyUSB0", 1, "geconIn1")
-        ,_GeconIn2("/dev/ttyUSB0", 2, "geconIn2")
-        ,_GeconOut3("/dev/ttyUSB0", 3, "geconOut3")
-        ,_GeconOut4("/dev/ttyUSB0", 4, "geconOut4")
-        ,_PhoneNumber(5, "phone", 17, 27)
+        ,_GeconIn1("/dev/ttyUSB0", 1, "geconIn1",mimodule::ModuleIOSyncMode::SyncModeManager,0)
+        ,_GeconIn2("/dev/ttyUSB0", 2, "geconIn2", mimodule::ModuleIOSyncMode::SyncModeManager,0)
+        ,_GeconOut3("/dev/ttyUSB0", 3, "geconOut3", mimodule::ModuleIOSyncMode::SyncModeManager,0)
+        ,_GeconOut4("/dev/ttyUSB0", 4, "geconOut4", mimodule::ModuleIOSyncMode::SyncModeManager,0)
+        ,_PhoneNumber(5, "phone", 17, 27, mimodule::ModuleIOSyncMode::SyncModeModuleCyclic)
         ,_PhoneJack("PhoneJack", 
             std::vector<mimodule::ModuleMiRpiGpioConfiguration>
             {
@@ -128,9 +142,10 @@ public:
                     5
                 }
             }
-    )
-        , _Sevenofnine("/dev/spidev0.0", "sevenofnine")
-        , _ModulVolume(0x48, 0.1, "Volume")
+        , mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, 20)
+   
+        , _Sevenofnine("/dev/spidev0.0", "sevenofnine", mimodule::ModuleIOSyncMode::SyncModeModuleCyclic,20)
+        , _ModulVolume(0x48, 0.1, "Volume", mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, 10)
 
         , _MiComponentManager(_ComponentManagerIntervall)
         , _WavePath(wavePath)
@@ -151,28 +166,6 @@ public:
         createComponents();
     }
 
-    void start()
-    {
-        _ModuleManager.start();
-        _MiComponentManager.start();
-    }
-
-    void stop()
-    {
-        _ModuleManager.stop();
-    }
-
-    virtual void PhoneNumberchanged(int number)
-    {
-        _SegmentNumber++;
-        _MiSevenSegment->setSegment(_SegmentNumber, number);
-        
-        if (_SegmentNumber > 8)
-        {
-            _SegmentNumber = 0;
-            _MiSevenSegment->setBlank();
-        }
-    }
-
-
+    void start();
+    void stop();
 };
