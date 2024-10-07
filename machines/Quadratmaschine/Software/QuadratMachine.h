@@ -39,9 +39,10 @@ private:
     int _PhoneJackModuleIntervall;
 
     int _ComponentManagerIntervall; //5
-    int _LedStripIntervallIntervall; //100
+    int _LedStripIntervall; //100
     int _SmoothLedIntervall; // 100
     int _LightGameIntervall; // 100
+    int _LampFlashIntervall; // 250
 
     mimodule::ModuleManager _ModuleManager;
     mimodule::ModuleGecon32Input _GeconIn1;
@@ -120,13 +121,23 @@ private:
     );
     void createComponents();
     int getModulAddressFromChannelName(const std::string& input);
-    void readIniFile(const std::string& filePath,const std::string& key);
-
+    int getValueFromIniFile(const std::string& filePath,const std::string& key);
+   
     virtual void PhoneNumberchanged(int number);
     
 public:
-    QuadratMachine(const std::string& wavePath)
-        : _ModuleManager(_ModuleManagerInterval)
+    QuadratMachine(const std::string& wavePath, const std::string& iniPath)
+        : _ModuleManagerInterval(20)
+        , _PhoneNumberModuleIntervall(5)//5
+        , _SevenSegmentModuleIntervall(20) //20
+        , _ModuleVolumeIntervall(10)
+        , _PhoneJackModuleIntervall(10)
+        , _ComponentManagerIntervall(10)
+        , _LedStripIntervall(100) //100
+        , _SmoothLedIntervall(5) // 100
+        , _LightGameIntervall(100) // 100
+        , _LampFlashIntervall(250)
+        , _ModuleManager(_ModuleManagerInterval)
         ,_GeconIn1("/dev/ttyUSB0", 1, "geconIn1",mimodule::ModuleIOSyncMode::SyncModeManager,0)
         ,_GeconIn2("/dev/ttyUSB0", 2, "geconIn2", mimodule::ModuleIOSyncMode::SyncModeManager,0)
         ,_GeconOut3("/dev/ttyUSB0", 3, "geconOut3", mimodule::ModuleIOSyncMode::SyncModeManager,0)
@@ -142,10 +153,10 @@ public:
                     5
                 }
             }
-        , mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, 20)
+        , mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, _PhoneNumberModuleIntervall)
    
-        , _Sevenofnine("/dev/spidev0.0", "sevenofnine", mimodule::ModuleIOSyncMode::SyncModeModuleCyclic,20)
-        , _ModulVolume(0x48, 0.1, "Volume", mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, 10)
+        , _Sevenofnine("/dev/spidev0.0", "sevenofnine", mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, _SevenSegmentModuleIntervall)
+        , _ModulVolume(0x48, 0.1, "Volume", mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, _ModuleVolumeIntervall)
 
         , _MiComponentManager(_ComponentManagerIntervall)
         , _WavePath(wavePath)
@@ -154,7 +165,53 @@ public:
         , _LighGameState(LighGameState::off)
         , _SegmentNumber(0)
     {
-       
+
+        int tmp = getValueFromIniFile(iniPath, "ModuleManagerInterval");
+        if (tmp != -1)
+        {
+            _ModuleManagerInterval = tmp;
+        }
+        tmp = getValueFromIniFile(iniPath, "PhoneNumberModuleIntervall");
+        if (tmp != -1)
+        {
+            _PhoneNumberModuleIntervall = tmp;
+        }
+        tmp = getValueFromIniFile(iniPath, "SevenSegmentModuleIntervall");
+        if (tmp != -1)
+        {
+            _SevenSegmentModuleIntervall = tmp;
+        }
+        tmp = getValueFromIniFile(iniPath, "PhoneJackModuleIntervall");
+        if (tmp != -1)
+        {
+            _PhoneJackModuleIntervall = tmp;
+        }
+        tmp = getValueFromIniFile(iniPath, "ComponentManagerIntervall");
+        if (tmp != -1)
+        {
+            _ComponentManagerIntervall = tmp;
+        }
+        tmp = getValueFromIniFile(iniPath, "LedStripIntervall");
+        if (tmp != -1)
+        {
+            _LedStripIntervall = tmp;
+        }
+        tmp = getValueFromIniFile(iniPath, "SmoothLedIntervall");
+        if (tmp != -1)
+        {
+            _SmoothLedIntervall = tmp;
+        }
+        tmp = getValueFromIniFile(iniPath, "LightGameIntervall");
+        if (tmp != -1)
+        {
+            _LightGameIntervall = tmp;
+        }
+        tmp = getValueFromIniFile(iniPath, "LampFlashIntervall");
+        if (tmp != -1)
+        {
+            _LampFlashIntervall = tmp;
+        }
+        
         _ModuleManager.addModule(&_GeconIn1);
         _ModuleManager.addModule(&_GeconIn2);
         _ModuleManager.addModule(&_GeconOut3);

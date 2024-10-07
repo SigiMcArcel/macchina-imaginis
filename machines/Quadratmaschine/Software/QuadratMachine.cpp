@@ -195,9 +195,9 @@ void QuadratMachine::createAndAddWaveButtonLamp(
 
 	_MiComponentManager.registerComponent<micomponents::miPlayWaveButtonLamp>(
 		wavename,
-		10,
+		-1,
 		lampType,
-		250,
+		_LampFlashIntervall,
 		inchannel,
 		outchannel,
 		buttonType,
@@ -253,9 +253,9 @@ void QuadratMachine::createAndAddButtonLamp(
 	
 	_MiComponentManager.registerComponent<micomponents::miButtonLamp>(
 		name,
-		10,
+		-1,
 		lampType,
-		250,
+		_LampFlashIntervall,
 		inchannel,
 		outchannel,
 		this,
@@ -292,8 +292,8 @@ void QuadratMachine::createAndAddLamp(
 	_MiComponentManager.registerComponent<micomponents::miLamp>(
 		name,
 		lampType,
-		5,
-	250,
+		-1,
+		_LampFlashIntervall,
 	outchannel);
 }
 
@@ -319,7 +319,7 @@ void QuadratMachine::createAndAddButton(
 	}
 	_MiComponentManager.registerComponent<micomponents::miButton>(
 		name,
-		10,
+		-1,
 		inchannel,
 		this,
 		false);
@@ -379,9 +379,9 @@ void QuadratMachine::createComponents()
 	_MiComponentManager.registerComponent<micomponents::miPhoneNumber>("dial", 5, _PhoneNumber.getChannel("PhoneNumber"), this);
 	_MiSevenSegment = _MiComponentManager.getComponent<micomponents::miSevenSegment>("seven");
 
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripYellow", MAX_LED_YELLOW, _LedStripIntervallIntervall,-1, _SmoothLedIntervall, "/dev/ttyACM1");
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripBlue", MAX_LED_BLUE, _LedStripIntervallIntervall, -1, _SmoothLedIntervall,"/dev/ttyACM2");
-	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripRed", MAX_LED_RED, _LedStripIntervallIntervall, SMOOTHED_LED, _SmoothLedIntervall,"/dev/ttyACM0");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripYellow", MAX_LED_YELLOW, _LedStripIntervall,-1, _SmoothLedIntervall, "/dev/ttyACM1");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripBlue", MAX_LED_BLUE, _LedStripIntervall, -1, _SmoothLedIntervall,"/dev/ttyACM2");
+	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripRed", MAX_LED_RED, _LedStripIntervall, SMOOTHED_LED, _SmoothLedIntervall,"/dev/ttyACM0");
 	_MiLedStripYellow = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripYellow");
 	_MiLedStripBlue = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripBlue");
 	_MiLedStripRed = _MiComponentManager.getComponent<micomponents::miLedStrip>("LedstripRed");
@@ -391,7 +391,7 @@ void QuadratMachine::createComponents()
 
 	_MiComponentManager.registerComponent<micomponents::miAudio>(
 		"miAudio",
-		_ComponentManagerIntervall,
+		-1,
 		_ModulVolume.getChannel("Potentiometer"),
 		_PhoneJack.getChannel("GPIO5"),
 		_Audio,
@@ -427,7 +427,8 @@ void QuadratMachine::stop()
 	_ModuleManager.stop();
 }
 
-int QuadratMachine::getValueFromIniFile(const std::string& filePath, const std::string& key) {
+int QuadratMachine::getValueFromIniFile(const std::string& filePath, const std::string& key) 
+{
 	std::ifstream iniFile(filePath);
 	if (!iniFile.is_open()) {
 		std::cerr << "Fehler: Konnte die Datei " << filePath << " nicht öffnen." << std::endl;
