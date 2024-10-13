@@ -12,217 +12,230 @@
 #include <mi/misound/Audio.h>
 #include <mi/mimodules/ModuleManager.h>
 #include <mi/micomponents/miComponentManager.h>
+#include <mi/mitasks/miTaskManager.h>
+#include "LightGame.h"
 
-class QuadratMachine
-    :public micomponents::miPhoneNumberInterface
-    ,public miutils::EventListener
-    ,public micomponents::miButtonEventInterface
+namespace miQuadratMachine
 {
-
-    typedef enum class LighGameState_e
+    class QuadratMachine
+        :public micomponents::miPhoneNumberInterface
+        , public micomponents::miButtonEventInterface
     {
-        off,
-        game1,
-        game2
-    }LighGameState;
 
-private:
-    /*int _ModuleManagerInterval = 50;
-    int _ComponentManagerIntervall = 5;
-    int _LedStripIntervallIntervall = 100;*/
+    private:
+        
 
+        int _ModuleManagerInterval; //50
+        int _RotaryDialModuleIntervall; //5
+        int _SevenSegmentModuleIntervall; //20
+        int _PotentiometerModuleIntervall;
+        int _PhoneJackModuleIntervall;
 
-    int _ModuleManagerInterval; //50
-    int _PhoneNumberModuleIntervall; //5
-    int _SevenSegmentModuleIntervall; //20
-    int _ModuleVolumeIntervall;
-    int _PhoneJackModuleIntervall;
+        int _ComponentManagerIntervall; //5
+        int _LedStripIntervall; //100
+        int _SmoothLedIntervall; // 100
+        int _LightGameIntervall; // 100
+        int _LampFlashIntervall; // 250
 
-    int _ComponentManagerIntervall; //5
-    int _LedStripIntervall; //100
-    int _SmoothLedIntervall; // 100
-    int _LightGameIntervall; // 100
-    int _LampFlashIntervall; // 250
+        mimodule::ModuleGecon32Input _GeconIn1;
+        mimodule::ModuleGecon32Input _GeconIn2;
+        mimodule::ModuleGecon32Output _GeconOut3;
+        mimodule::ModuleGecon32Output _GeconOut4;
+        mimodule::ModuleMiPhoneNumber _RotaryDialModule;
+        mimodule::ModuleMiRpiGpio _PhoneJack;
+        mimodule::ModuleMiSevenSegment _SevenSegmentModule;
+        mimodule::ModuleMiPotentiometerADS1115 _PotentiometerModule;
+      
+        std::string _WavePath;
+        misound::Audio _Audio;
+        std::shared_ptr<micomponents::miAudio> _MiAudio;
+        std::shared_ptr<micomponents::miSevenSegment> _MiSevenSegment;
+        std::shared_ptr<micomponents::miLedStrip> _MiLedStripYellow;
+        std::shared_ptr<micomponents::miLedStrip> _MiLedStripBlue;
+        std::shared_ptr<micomponents::miLedStrip> _MiLedStripRed;
+        LightGame _LightGame;
 
-    mimodule::ModuleManager _ModuleManager;
-    mimodule::ModuleGecon32Input _GeconIn1;
-    mimodule::ModuleGecon32Input _GeconIn2;
-    mimodule::ModuleGecon32Output _GeconOut3;
-    mimodule::ModuleGecon32Output _GeconOut4;
-    mimodule::ModuleMiPhoneNumber _PhoneNumber;
-    mimodule::ModuleMiRpiGpio _PhoneJack;
-    mimodule::ModuleMiSevenSegment _Sevenofnine;
-    mimodule::ModuleMiPotentiometerADS1115 _ModulVolume;
+        micomponents::miComponentManager _MiComponentManager;
 
-    micomponents::miComponentManager _MiComponentManager;
+        mitasks::miTaskBase _ModbusTask;
+        mitasks::miTaskBase _LedStripTask;
+        mitasks::miTaskBase _RotaryDialTask;
+        mitasks::miTaskBase _SevenSegmentTask;
+        mitasks::miTaskBase _AudioTask;
+        mitasks::miTaskManager _TaskManager;
 
-    std::string _WavePath;
-    misound::Audio _Audio;
-    std::shared_ptr<micomponents::miAudio> _MiAudio;
-    std::shared_ptr<micomponents::miSevenSegment> _MiSevenSegment;
-    std::shared_ptr<micomponents::miLedStrip> _MiLedStripYellow;
-    std::shared_ptr<micomponents::miLedStrip> _MiLedStripBlue;
-    std::shared_ptr<micomponents::miLedStrip> _MiLedStripRed;
-    
+        int _SegmentNumber;
 
-    miutils::Timer _Timer;
-    LighGameState _LighGameState;
-    int _SegmentNumber;
-   
-    const int  MAX_LED_RED = 130;
-    const int  SMOOTHED_LED = 129;
-    const int  MAX_LED_YELLOW = 132;
-    const int  MAX_LED_BLUE = 148;
+        const int  MAX_LED_RED = 130;
+        const int  SMOOTHED_LED = 129;
+        const int  MAX_LED_YELLOW = 132;
+        const int  MAX_LED_BLUE = 148;
 
-    //To do Would be nice to give a name
-    const std::vector<mimodule::ModuleMiRpiGpioConfiguration> _PhoneJackConfiguration =
-    {
+        //To do Would be nice to give a name
+        const std::vector<mimodule::ModuleMiRpiGpioConfiguration> _PhoneJackConfiguration =
         {
-            sizeof(mimodule::ModuleMiRpiGpioConfiguration),
-            mimodule::ModuleMiRpiGpioState::Active,
-            mimodule::ModulChannelDirection::Input,
-            5
-        }
-    };
-    
-    virtual void eventOccured(void* sender, const std::string& name) override;
-    virtual void ButtonDown(const std::string& name);
-    virtual void ButtonUp(const std::string& name);
-    virtual void ButtonClick(const std::string& name);
-    virtual void ButtonToggle(bool state, const std::string& name);
-    
-    void createAndAddWaveButtonLamp(
-        const std::string& wavename,
-        const std::string& inputChannelName,
-        const std::string& outputChannelName,
-        micomponents::ButtonType buttonType,
-        micomponents::LampType lampType,
-        bool loop,
-        miButtonEventInterface* buttonEvent = nullptr
-    );
-
-    void createAndAddButtonLamp(
-        const std::string& name,
-        const std::string& inputChannelName,
-        const std::string& outputChannelName,
-        micomponents::ButtonType buttonType,
-        micomponents::LampType lampType
-    );
-
-    void createAndAddLamp(
-        const std::string& name,
-        const std::string& outputChannelName,
-        micomponents::LampType lampType
-    );
-
-    void createAndAddButton(
-        const std::string& name,
-        const std::string& inputChannelName
-    );
-    void createComponents();
-    int getModulAddressFromChannelName(const std::string& input);
-    int getValueFromIniFile(const std::string& filePath,const std::string& key);
-   
-    virtual void PhoneNumberchanged(int number);
-    
-public:
-    QuadratMachine(const std::string& wavePath, const std::string& iniPath)
-        : _ModuleManagerInterval(20)
-        , _PhoneNumberModuleIntervall(5)//5
-        , _SevenSegmentModuleIntervall(20) //20
-        , _ModuleVolumeIntervall(10)
-        , _PhoneJackModuleIntervall(10)
-        , _ComponentManagerIntervall(10)
-        , _LedStripIntervall(100) //100
-        , _SmoothLedIntervall(5) // 100
-        , _LightGameIntervall(100) // 100
-        , _LampFlashIntervall(250)
-        , _ModuleManager(_ModuleManagerInterval)
-        ,_GeconIn1("/dev/ttyUSB0", 1, "geconIn1",mimodule::ModuleIOSyncMode::SyncModeManager,0)
-        ,_GeconIn2("/dev/ttyUSB0", 2, "geconIn2", mimodule::ModuleIOSyncMode::SyncModeManager,0)
-        ,_GeconOut3("/dev/ttyUSB0", 3, "geconOut3", mimodule::ModuleIOSyncMode::SyncModeManager,0)
-        ,_GeconOut4("/dev/ttyUSB0", 4, "geconOut4", mimodule::ModuleIOSyncMode::SyncModeManager,0)
-        ,_PhoneNumber(5, "phone", 17, 27, mimodule::ModuleIOSyncMode::SyncModeModuleCyclic)
-        ,_PhoneJack("PhoneJack", 
-            std::vector<mimodule::ModuleMiRpiGpioConfiguration>
             {
-                {
-                    sizeof(mimodule::ModuleMiRpiGpioConfiguration),
+                sizeof(mimodule::ModuleMiRpiGpioConfiguration),
+                mimodule::ModuleMiRpiGpioState::Active,
+                mimodule::ModulChannelDirection::Input,
+                5
+            }
+        };
+
+        virtual void ButtonDown(const std::string& name);
+        virtual void ButtonUp(const std::string& name);
+        virtual void ButtonClick(const std::string& name);
+        virtual void ButtonToggle(bool state, const std::string& name);
+
+        void createAndAddWaveButtonLamp(
+            const std::string& wavename,
+            const std::string& inputChannelName,
+            const std::string& outputChannelName,
+            micomponents::ButtonType buttonType,
+            micomponents::LampType lampType,
+            bool loop,
+            miButtonEventInterface* buttonEvent = nullptr
+        );
+
+        void createAndAddButtonLamp(
+            const std::string& name,
+            const std::string& inputChannelName,
+            const std::string& outputChannelName,
+            micomponents::ButtonType buttonType,
+            micomponents::LampType lampType
+        );
+
+        void createAndAddLamp(
+            const std::string& name,
+            const std::string& outputChannelName,
+            micomponents::LampType lampType
+        );
+
+        void createAndAddButton(
+            const std::string& name,
+            const std::string& inputChannelName
+        );
+        void createComponents();
+        int getModulAddressFromChannelName(const std::string& input);
+        int getValueFromIniFile(const std::string& filePath, const std::string& key);
+
+        virtual void PhoneNumberchanged(int number);
+
+    public:
+        QuadratMachine(const std::string& wavePath, const std::string& iniPath)
+            : _ModuleManagerInterval(10)
+            , _RotaryDialModuleIntervall(5)//5
+            , _SevenSegmentModuleIntervall(20) //20
+            , _PotentiometerModuleIntervall(20)
+            , _PhoneJackModuleIntervall(10)
+            , _ComponentManagerIntervall(1)
+            , _LedStripIntervall(100) //100
+            , _SmoothLedIntervall(5) // 100
+            , _LightGameIntervall(150) // 100
+            , _LampFlashIntervall(250)
+            , _GeconIn1("/dev/ttyUSB0", 1, "geconIn1")
+            , _GeconIn2("/dev/ttyUSB0", 2, "geconIn2")
+            , _GeconOut3("/dev/ttyUSB0", 3, "geconOut3")
+            , _GeconOut4("/dev/ttyUSB0", 4, "geconOut4")
+            , _RotaryDialModule(5, "phone", 17, 27)
+            , _PhoneJack("PhoneJack",
+                std::vector<mimodule::ModuleMiRpiGpioConfiguration>
+        {
+            {
+                sizeof(mimodule::ModuleMiRpiGpioConfiguration),
                     mimodule::ModuleMiRpiGpioState::Active,
                     mimodule::ModulChannelDirection::Input,
                     5
-                }
             }
-        , mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, _PhoneNumberModuleIntervall)
-   
-        , _Sevenofnine("/dev/spidev0.0", "sevenofnine", mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, _SevenSegmentModuleIntervall)
-        , _ModulVolume(0x48, 0.1, "Volume", mimodule::ModuleIOSyncMode::SyncModeModuleCyclic, _ModuleVolumeIntervall)
+        }
+        )
 
-        , _MiComponentManager(_ComponentManagerIntervall)
-        , _WavePath(wavePath)
-        , _Audio(std::string("plug:dmix0"), _WavePath)
-        , _Timer("LightGame", this)
-        , _LighGameState(LighGameState::off)
-        , _SegmentNumber(0)
-    {
+            , _SevenSegmentModule("/dev/spidev0.0", "sevenofnine")
+            , _PotentiometerModule(0x48, 0.1, "Volume")
+            , _WavePath(wavePath)
+            , _Audio(std::string("plug:dmix0"), _WavePath)
+            , _LightGame(&_MiComponentManager,_LightGameIntervall)
+            , _MiComponentManager()
+            , _ModbusTask("ModbusTask",30,0,50,miutils::SchedulerType::Fifo)
+            , _LedStripTask("LedStripTask", 20, 0, 20, miutils::SchedulerType::Fifo)
+            , _RotaryDialTask("PhoneNumberTask", 5, 0, 20, miutils::SchedulerType::Fifo)
+            , _SevenSegmentTask("SevenSegmentTask", 20, 0, 20, miutils::SchedulerType::Other)
+            , _AudioTask("AudioTask", 20, 0, 20, miutils::SchedulerType::Other)
+            , _TaskManager()
+            , _SegmentNumber(0)
+        {
+            int tmp = getValueFromIniFile(iniPath, "ModuleManagerInterval");
+            if (tmp != -1)
+            {
+                _ModuleManagerInterval = tmp;
+            }
+            tmp = getValueFromIniFile(iniPath, "RotaryDialModuleIntervall");
+            if (tmp != -1)
+            {
+                _RotaryDialModuleIntervall = tmp;
+            }
+            tmp = getValueFromIniFile(iniPath, "SevenSegmentModuleIntervall");
+            if (tmp != -1)
+            {
+                _SevenSegmentModuleIntervall = tmp;
+            }
+            tmp = getValueFromIniFile(iniPath, "PhoneJackModuleIntervall");
+            if (tmp != -1)
+            {
+                _PhoneJackModuleIntervall = tmp;
+            }
+            tmp = getValueFromIniFile(iniPath, "ComponentManagerIntervall");
+            if (tmp != -1)
+            {
+                _ComponentManagerIntervall = tmp;
+            }
+            tmp = getValueFromIniFile(iniPath, "LedStripIntervall");
+            if (tmp != -1)
+            {
+                _LedStripIntervall = tmp;
+            }
+            tmp = getValueFromIniFile(iniPath, "SmoothLedIntervall");
+            if (tmp != -1)
+            {
+                _SmoothLedIntervall = tmp;
+            }
+            tmp = getValueFromIniFile(iniPath, "LightGameIntervall");
+            if (tmp != -1)
+            {
+                _LightGameIntervall = tmp;
+            }
+            tmp = getValueFromIniFile(iniPath, "LampFlashIntervall");
+            if (tmp != -1)
+            {
+                _LampFlashIntervall = tmp;
+            }
 
-        int tmp = getValueFromIniFile(iniPath, "ModuleManagerInterval");
-        if (tmp != -1)
-        {
-            _ModuleManagerInterval = tmp;
-        }
-        tmp = getValueFromIniFile(iniPath, "PhoneNumberModuleIntervall");
-        if (tmp != -1)
-        {
-            _PhoneNumberModuleIntervall = tmp;
-        }
-        tmp = getValueFromIniFile(iniPath, "SevenSegmentModuleIntervall");
-        if (tmp != -1)
-        {
-            _SevenSegmentModuleIntervall = tmp;
-        }
-        tmp = getValueFromIniFile(iniPath, "PhoneJackModuleIntervall");
-        if (tmp != -1)
-        {
-            _PhoneJackModuleIntervall = tmp;
-        }
-        tmp = getValueFromIniFile(iniPath, "ComponentManagerIntervall");
-        if (tmp != -1)
-        {
-            _ComponentManagerIntervall = tmp;
-        }
-        tmp = getValueFromIniFile(iniPath, "LedStripIntervall");
-        if (tmp != -1)
-        {
-            _LedStripIntervall = tmp;
-        }
-        tmp = getValueFromIniFile(iniPath, "SmoothLedIntervall");
-        if (tmp != -1)
-        {
-            _SmoothLedIntervall = tmp;
-        }
-        tmp = getValueFromIniFile(iniPath, "LightGameIntervall");
-        if (tmp != -1)
-        {
-            _LightGameIntervall = tmp;
-        }
-        tmp = getValueFromIniFile(iniPath, "LampFlashIntervall");
-        if (tmp != -1)
-        {
-            _LampFlashIntervall = tmp;
-        }
-        
-        _ModuleManager.addModule(&_GeconIn1);
-        _ModuleManager.addModule(&_GeconIn2);
-        _ModuleManager.addModule(&_GeconOut3);
-        _ModuleManager.addModule(&_GeconOut4);
-        _ModuleManager.addModule(&_PhoneNumber);
-        _ModuleManager.addModule(&_PhoneJack);
-        _ModuleManager.addModule(&_Sevenofnine);
-        _ModuleManager.addModule(&_ModulVolume);
-        createComponents();
-    }
+            
+            createComponents();
 
-    void start();
-    void stop();
-};
+            //prepare Tasks
+            _ModbusTask.addIOModul(&_GeconIn1);
+            _ModbusTask.addIOModul(&_GeconIn2);
+            _ModbusTask.addIOModul(&_GeconOut3);
+            _ModbusTask.addIOModul(&_GeconOut4);
+            _ModbusTask.addComponent(&_LightGame);
+            _ModbusTask.addComponent(&_MiComponentManager);
+            _LedStripTask.addComponent(&_MiComponentManager);
+           
+            _RotaryDialTask.addIOModul(&_RotaryDialModule);
+            _SevenSegmentTask.addIOModul(&_SevenSegmentModule);
+            _AudioTask.addIOModul(&_PotentiometerModule);
+            _AudioTask.addIOModul(&_PhoneJack);
+
+            _TaskManager.AddTask(&_ModbusTask);
+            _TaskManager.AddTask(&_LedStripTask);
+            _TaskManager.AddTask(&_RotaryDialTask);
+            _TaskManager.AddTask(&_SevenSegmentTask);
+            _TaskManager.AddTask(&_AudioTask);
+
+        }
+
+        void start();
+        void stop();
+    };
+}

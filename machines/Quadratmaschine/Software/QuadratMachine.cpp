@@ -1,7 +1,7 @@
 #include <memory>
 #include "QuadratMachine.h"
 
-void QuadratMachine::ButtonDown(const std::string& name)
+void miQuadratMachine::QuadratMachine::ButtonDown(const std::string& name)
 {
 	printf("QuadratMachine::ButtonDown %s\n", name.c_str());
 	if (name == "emergencyStop_Button")
@@ -35,20 +35,19 @@ void QuadratMachine::ButtonDown(const std::string& name)
 	{
 		_MiComponentManager.checkAll(true);
 	}
-	if (name == "lightgame1")
+	else if (name == "lightgame1")
 	{
 		_MiLedStripYellow->stopLED();
 		_MiLedStripBlue->stopLED();
 		_MiLedStripRed->stopLED();
-		_MiComponentManager.LampOffAll();
-		_LighGameState = LighGameState::game1;
+		_LightGame.startGame(miQuadratMachine::LighGameState::game1);
 	}
 	else if (name == "lightgame2")
 	{
 		_MiLedStripYellow->stopLED();
 		_MiLedStripBlue->stopLED();
 		_MiLedStripRed->stopLED();
-		_LighGameState = LighGameState::game2;
+		_LightGame.startGame(miQuadratMachine::LighGameState::game2);
 	}
 	else
 	{
@@ -56,7 +55,7 @@ void QuadratMachine::ButtonDown(const std::string& name)
 	}
 }
 
-void QuadratMachine::ButtonUp(const std::string& name)
+void miQuadratMachine::QuadratMachine::ButtonUp(const std::string& name)
 {
 	printf("QuadratMachine::ButtonUp %s\n", name.c_str());
 	if (name == "emergencyStop_Button")
@@ -85,13 +84,22 @@ void QuadratMachine::ButtonUp(const std::string& name)
 	{
 		_MiLedStripRed->startSmoothingLed(false);
 	}
-	if (name == "lightgame1")
+	else if ((name == "lightgame1") || (name == "lightgame2"))
 	{
-		_LighGameState = LighGameState::off;
-	}
-	else if (name == "lightgame2")
-	{
-		_LighGameState = LighGameState::off;
+		_LightGame.stopGame();
+		
+		if (_MiComponentManager.getComponentValue("ledStripYellowOnOff_Button", "ButtonState") == "1")
+		{
+			_MiLedStripYellow->startLED();
+		}
+		if (_MiComponentManager.getComponentValue("ledStripBlueOnOff_Button", "ButtonState") == "1")
+		{
+			_MiLedStripBlue->startLED();
+		}
+		if (_MiComponentManager.getComponentValue("ledStripRedOnOff_Button", "ButtonState") == "1")
+		{
+			_MiLedStripRed->startLED();
+		}
 	}
 	else
 	{
@@ -99,7 +107,7 @@ void QuadratMachine::ButtonUp(const std::string& name)
 	}
 }
 
-void QuadratMachine::ButtonClick(const std::string& name)
+void miQuadratMachine::QuadratMachine::ButtonClick(const std::string& name)
 {
 	printf("QuadratMachine::ButtonClick %s\n", name.c_str());
 	if (name == "ledStripeModeYellow")
@@ -116,28 +124,12 @@ void QuadratMachine::ButtonClick(const std::string& name)
 	}
 }
 
-void QuadratMachine::ButtonToggle(bool state, const std::string& name)
+void miQuadratMachine::QuadratMachine::ButtonToggle(bool state, const std::string& name)
 {
 	printf("QuadratMachine::ButtonClick %s\n", name.c_str());
 }
 
-void QuadratMachine::eventOccured(void* sender, const std::string& name)
-{
-	if (_LighGameState == LighGameState::off)
-	{
-		return;
-	}
-	else if (_LighGameState == LighGameState::game1)
-	{
-
-	}
-	else if (_LighGameState == LighGameState::game2)
-	{
-
-	}
-}
-
-void QuadratMachine::PhoneNumberchanged(int number)
+void miQuadratMachine::QuadratMachine::PhoneNumberchanged(int number)
 {
 	_SegmentNumber++;
 	_MiSevenSegment->setSegment(_SegmentNumber, number);
@@ -146,10 +138,15 @@ void QuadratMachine::PhoneNumberchanged(int number)
 	{
 		_SegmentNumber = 0;
 		_MiSevenSegment->reset();
+		_MiComponentManager.LampOff("p14");
+	}
+	else if (_SegmentNumber > 0)
+	{
+		_MiComponentManager.LampOn("p14");
 	}
 }
 
-void QuadratMachine::createAndAddWaveButtonLamp(
+void miQuadratMachine::QuadratMachine::createAndAddWaveButtonLamp(
 	const std::string& wavename,
 	const std::string& inputChannelName,
 	const std::string& outputChannelName,
@@ -193,7 +190,7 @@ void QuadratMachine::createAndAddWaveButtonLamp(
 		
 	}
 
-	_MiComponentManager.registerComponent<micomponents::miPlayWaveButtonLamp>(
+	micomponents::miPlayWaveButtonLamp* wbl =_MiComponentManager.registerComponent<micomponents::miPlayWaveButtonLamp>(
 		wavename,
 		-1,
 		lampType,
@@ -205,10 +202,11 @@ void QuadratMachine::createAndAddWaveButtonLamp(
 		_Audio,
 		false,
 		loop
-		);
+		).get();
+	_ModbusTask.addComponent(wbl);
 }
 
-void QuadratMachine::createAndAddButtonLamp(
+void miQuadratMachine::QuadratMachine::createAndAddButtonLamp(
 	const std::string& name,
 	const std::string& inputChannelName,
 	const std::string& outputChannelName,
@@ -251,7 +249,7 @@ void QuadratMachine::createAndAddButtonLamp(
 		return;
 	}
 	
-	_MiComponentManager.registerComponent<micomponents::miButtonLamp>(
+	micomponents::miButtonLamp* bl = _MiComponentManager.registerComponent<micomponents::miButtonLamp>(
 		name,
 		-1,
 		lampType,
@@ -260,10 +258,11 @@ void QuadratMachine::createAndAddButtonLamp(
 		outchannel,
 		this,
 		buttonType,
-		false);
+		false).get();
+	_ModbusTask.addComponent(bl);
 }
 
-void QuadratMachine::createAndAddLamp(
+void miQuadratMachine::QuadratMachine::createAndAddLamp(
 	const std::string& name,
 	const std::string& outputChannelName,
 	micomponents::LampType lampType
@@ -289,15 +288,16 @@ void QuadratMachine::createAndAddLamp(
 		printf("createAndAddLamps invalid channel %s\n", outputChannelName.c_str());
 		return;
 	}
-	_MiComponentManager.registerComponent<micomponents::miLamp>(
+	micomponents::miLamp* l = _MiComponentManager.registerComponent<micomponents::miLamp>(
 		name,
 		lampType,
 		-1,
 		_LampFlashIntervall,
-	outchannel);
+	outchannel).get();
+	_ModbusTask.addComponent(l);
 }
 
-void QuadratMachine::createAndAddButton(
+void miQuadratMachine::QuadratMachine::createAndAddButton(
 	const std::string& name,
 	const std::string& inputChannelName
 )
@@ -317,15 +317,17 @@ void QuadratMachine::createAndAddButton(
 	{
 		inchannel = _GeconIn2.getChannel(inputChannelName);
 	}
-	_MiComponentManager.registerComponent<micomponents::miButton>(
+	micomponents::miButton* b = _MiComponentManager.registerComponent<micomponents::miButton>(
 		name,
 		-1,
 		inchannel,
 		this,
-		false);
+		false).get();
+
+	_ModbusTask.addComponent(b);
 }
 
-void QuadratMachine::createComponents()
+void miQuadratMachine::QuadratMachine::createComponents()
 {
 
 	createAndAddWaveButtonLamp("s1p1", "E1.0", "A3.0", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
@@ -375,9 +377,13 @@ void QuadratMachine::createComponents()
 	createAndAddButtonLamp("ledStripBlueOnOff", "E2.15", "A4.15", micomponents::ButtonType::Switch, micomponents::LampType::Fix);
 	createAndAddButtonLamp("ledStripRedOnOff", "E2.16", "A4.16", micomponents::ButtonType::Switch, micomponents::LampType::Fix);
 	createAndAddLamp("Error", "A4.25", micomponents::LampType::Flash);
-	_MiComponentManager.registerComponent<micomponents::miSevenSegment>("seven", 20, _Sevenofnine);
-	_MiComponentManager.registerComponent<micomponents::miPhoneNumber>("dial", 5, _PhoneNumber.getChannel("PhoneNumber"), this);
-	_MiSevenSegment = _MiComponentManager.getComponent<micomponents::miSevenSegment>("seven");
+	
+	_MiComponentManager.registerComponent<micomponents::miSevenSegment>("SevenSegmentComponent", 20, _SevenSegmentModule);
+	_MiComponentManager.registerComponent<micomponents::miPhoneNumber>("RotaryDialComponent", 5, _RotaryDialModule.getChannel("PhoneNumber"), this);
+	_MiSevenSegment = _MiComponentManager.getComponent<micomponents::miSevenSegment>("SevenSegmentComponent");
+
+	_RotaryDialTask.addComponent(_MiComponentManager.getComponent<micomponents::miComponentBase>("RotaryDialComponent").get());
+	_RotaryDialTask.addComponent(_MiComponentManager.getComponent<micomponents::miComponentBase>("SevenSegmentComponent").get());
 
 	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripYellow", MAX_LED_YELLOW, _LedStripIntervall,-1, _SmoothLedIntervall, "/dev/ttyACM1");
 	_MiComponentManager.registerComponent<micomponents::miLedStrip>("LedstripBlue", MAX_LED_BLUE, _LedStripIntervall, -1, _SmoothLedIntervall,"/dev/ttyACM2");
@@ -389,19 +395,24 @@ void QuadratMachine::createComponents()
 	_MiLedStripBlue->setMode(micomponents::LedStripMode::running);
 	_MiLedStripRed->setMode(micomponents::LedStripMode::running);
 
+	_LedStripTask.addComponent(_MiComponentManager.getComponent<micomponents::miComponentBase>("LedstripYellow").get());
+	_LedStripTask.addComponent(_MiComponentManager.getComponent<micomponents::miComponentBase>("LedstripBlue").get());
+	_LedStripTask.addComponent(_MiComponentManager.getComponent<micomponents::miComponentBase>("LedstripRed").get());
+
 	_MiComponentManager.registerComponent<micomponents::miAudio>(
 		"miAudio",
 		-1,
-		_ModulVolume.getChannel("Potentiometer"),
+		_PotentiometerModule.getChannel("Potentiometer"),
 		_PhoneJack.getChannel("GPIO5"),
 		_Audio,
 		100.0,
 		"plug:dmix0",
 		"plug:dmix1");
 	_MiAudio = _MiComponentManager.getComponent<micomponents::miAudio>("miAudio");
+	_AudioTask.addComponent(_MiComponentManager.getComponent<micomponents::miComponentBase>("miAudio").get());
 }
 
-int QuadratMachine::getModulAddressFromChannelName(const std::string& input)
+int miQuadratMachine::QuadratMachine::getModulAddressFromChannelName(const std::string& input)
 {
 	// Finde die Position des ersten Punktes
 	size_t pos = input.find('.');
@@ -416,22 +427,21 @@ int QuadratMachine::getModulAddressFromChannelName(const std::string& input)
 	}
 }
 
-void QuadratMachine::start()
+void miQuadratMachine::QuadratMachine::start()
 {
-	_ModuleManager.start();
-	_MiComponentManager.start();
+	_TaskManager.Start();
 }
 
-void QuadratMachine::stop()
+void miQuadratMachine::QuadratMachine::stop()
 {
-	_ModuleManager.stop();
+	_TaskManager.Stop();
 }
 
-int QuadratMachine::getValueFromIniFile(const std::string& filePath, const std::string& key) 
+int miQuadratMachine::QuadratMachine::getValueFromIniFile(const std::string& filePath, const std::string& key)
 {
 	std::ifstream iniFile(filePath);
 	if (!iniFile.is_open()) {
-		std::cerr << "Fehler: Konnte die Datei " << filePath << " nicht öffnen." << std::endl;
+		std::cerr << "Coud not open " << filePath << std::endl;
 		return -1; // oder eine andere geeignete Fehlerkennzeichnung
 	}
 

@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     }
 #endif
     const std::string _WavePath = std::string("/home/root/sounds");
-    QuadratMachine _QuadratMachine(_WavePath,"/home/root/quadrat.ini");
+    miQuadratMachine::QuadratMachine _QuadratMachine(_WavePath,"/home/root/quadrat.ini");
     _QuadratMachine.start();
     while (true)
     {

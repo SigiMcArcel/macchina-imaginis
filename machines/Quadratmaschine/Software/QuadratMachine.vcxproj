@@ -75,6 +75,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="LightGame.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="QuadratMachine.cpp" />
   </ItemGroup>
@@ -82,11 +83,12 @@
     <None Include="Makefile" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LightGame.h" />
     <ClInclude Include="QuadratMachine.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>
-      <LibraryDependencies>miutils;mimodules;micomponents;misound;asound;midriver</LibraryDependencies>
+      <LibraryDependencies>miutils;mimodules;micomponents;misound;asound;midriver;mitasks</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
