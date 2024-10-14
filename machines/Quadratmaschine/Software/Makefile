@@ -5,7 +5,7 @@ bindir=/usr/lib
 
 INCLUDES = -I. -I/.
 CXXFLAGS = -fpic -Wall -Wl,--no-undefined
-LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lmidriver -lmitasks lmodbus
+LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lmidriver -lmitasks -lmodbus
 
 SOURCES=main.cpp QuadratMachine.cpp LightGame.cpp 
 OBJECTS=$(SOURCES:.cpp=.o)
