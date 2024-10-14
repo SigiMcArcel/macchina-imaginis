@@ -166,22 +166,22 @@ namespace miQuadratMachine
 
     public:
         QuadratMachine(const std::string& wavePath, const std::string& iniPath)
-            : _ModuleManagerInterval(10)
-            , _RotaryDialModuleIntervall(5)//5
-            , _SevenSegmentModuleIntervall(20) //20
-            , _PotentiometerModuleIntervall(20)
-            , _PhoneJackModuleIntervall(10)
-            , _ComponentManagerIntervall(1)
-            , _LedStripIntervall(100) //100
-            , _SmoothLedIntervall(5) // 100
-            , _LightGameIntervall(150) // 100
-            , _LampFlashIntervall(250)
-            , _VolumeOffset(25)
+            : _ModuleManagerInterval(getValueFromIniFile<int>(iniPath, "ModuleManagerInterval", 10))
+            , _RotaryDialModuleIntervall(getValueFromIniFile<int>(iniPath, "RotaryDialModuleIntervall",5 ))//5
+            , _SevenSegmentModuleIntervall(getValueFromIniFile<int>(iniPath, "SevenSegmentModuleIntervall", 20)) //20
+            , _PotentiometerModuleIntervall(getValueFromIniFile<int>(iniPath, "PotentiometerModuleIntervall", 20)) //20
+            , _PhoneJackModuleIntervall(getValueFromIniFile<int>(iniPath, "PhoneJackModuleIntervall", 10)) //10
+            , _ComponentManagerIntervall(getValueFromIniFile<int>(iniPath, "ComponentManagerIntervall", 10)) //1
+            , _LedStripIntervall(getValueFromIniFile<int>(iniPath, "LedStripIntervall", 100)) //100
+            , _SmoothLedIntervall(getValueFromIniFile<int>(iniPath, "SmoothLedIntervall", 2)) // 2
+            , _LightGameIntervall(getValueFromIniFile<int>(iniPath, "LightGameIntervall", 100)) // 100
+            , _LampFlashIntervall(getValueFromIniFile<int>(iniPath, "LampFlashIntervall", 250)) //250
+            , _VolumeOffset(getValueFromIniFile<double>(iniPath, "VolumeOffset", 25.0)) // 25
             , _GeconIn1("/dev/ttyUSB0", 1, "geconIn1")
             , _GeconIn2("/dev/ttyUSB0", 2, "geconIn2")
             , _GeconOut3("/dev/ttyUSB0", 3, "geconOut3")
             , _GeconOut4("/dev/ttyUSB0", 4, "geconOut4")
-            , _RotaryDialModule(5, "phone", 17, 27)
+            , _RotaryDialModule(_RotaryDialModuleIntervall, "phone", 17, 27)
             , _PhoneJack("PhoneJack",
                 std::vector<mimodule::ModuleMiRpiGpioConfiguration>
         {
@@ -201,64 +201,13 @@ namespace miQuadratMachine
             , _LightGame(&_MiComponentManager,_LightGameIntervall)
             , _MiComponentManager()
             , _ModbusTask("ModbusTask",30,0,50,miutils::SchedulerType::Fifo)
-            , _LedStripTask("LedStripTask", 20, 0, 20, miutils::SchedulerType::Fifo)
+            , _LedStripTask("LedStripTask", 5, 0, 20, miutils::SchedulerType::Fifo)
             , _RotaryDialTask("PhoneNumberTask", 5, 0, 20, miutils::SchedulerType::Fifo)
             , _SevenSegmentTask("SevenSegmentTask", 20, 0, 20, miutils::SchedulerType::Other)
             , _AudioTask("AudioTask", 20, 0, 20, miutils::SchedulerType::Other)
             , _TaskManager()
             , _SegmentNumber(0)
         {
-            int tmp = getValueFromIniFile<int>(iniPath, "ModuleManagerInterval");
-            if (tmp != -1)
-            {
-                _ModuleManagerInterval = tmp;
-            }
-            tmp = getValueFromIniFile<int>(iniPath, "RotaryDialModuleIntervall");
-            if (tmp != -1)
-            {
-                _RotaryDialModuleIntervall = tmp;
-            }
-            tmp = getValueFromIniFile<int>(iniPath, "SevenSegmentModuleIntervall");
-            if (tmp != -1)
-            {
-                _SevenSegmentModuleIntervall = tmp;
-            }
-            tmp = getValueFromIniFile<int>(iniPath, "PhoneJackModuleIntervall");
-            if (tmp != -1)
-            {
-                _PhoneJackModuleIntervall = tmp;
-            }
-            tmp = getValueFromIniFile<int>(iniPath, "ComponentManagerIntervall");
-            if (tmp != -1)
-            {
-                _ComponentManagerIntervall = tmp;
-            }
-            tmp = getValueFromIniFile<int>(iniPath, "LedStripIntervall");
-            if (tmp != -1)
-            {
-                _LedStripIntervall = tmp;
-            }
-            tmp = getValueFromIniFile<int>(iniPath, "SmoothLedIntervall");
-            if (tmp != -1)
-            {
-                _SmoothLedIntervall = tmp;
-            }
-            tmp = getValueFromIniFile<int>(iniPath, "LightGameIntervall");
-            if (tmp != -1)
-            {
-                _LightGameIntervall = tmp;
-            }
-            tmp = getValueFromIniFile<int>(iniPath, "LampFlashIntervall");
-            if (tmp != -1)
-            {
-                _LampFlashIntervall = tmp;
-            }
-            double dtmp = getValueFromIniFile<int>(iniPath, "LampFlashIntervall");
-            if (dtmp != -1)
-            {
-                _VolumeOffset = tmp;
-            }
-
             
             createComponents();
 
