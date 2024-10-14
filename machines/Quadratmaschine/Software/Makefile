@@ -5,12 +5,12 @@ bindir=/usr/lib
 
 INCLUDES = -I. -I/.
 CXXFLAGS = -fpic -Wall -Wl,--no-undefined
-LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lmidriver
+LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lmidriver -lmistasks
 
 SOURCES=main.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
-EXEOUT=miwoodenmachine
+EXEOUT=miquadratmachine
 
 
 .cpp.o:
