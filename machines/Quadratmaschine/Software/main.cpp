@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[])
 {
-    std::string soundPath("/usr/share/ misounds");
+    std::string soundPath("/usr/share/misounds");
 
     if (argc == 2)
     {
