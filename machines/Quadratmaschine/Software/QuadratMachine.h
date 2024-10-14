@@ -23,8 +23,6 @@ namespace miQuadratMachine
     {
 
     private:
-        
-
         int _ModuleManagerInterval; //50
         int _RotaryDialModuleIntervall; //5
         int _SevenSegmentModuleIntervall; //20
@@ -36,6 +34,7 @@ namespace miQuadratMachine
         int _SmoothLedIntervall; // 100
         int _LightGameIntervall; // 100
         int _LampFlashIntervall; // 250
+        double _VolumeOffset;
 
         mimodule::ModuleGecon32Input _GeconIn1;
         mimodule::ModuleGecon32Input _GeconIn2;
@@ -117,9 +116,53 @@ namespace miQuadratMachine
         );
         void createComponents();
         int getModulAddressFromChannelName(const std::string& input);
-        int getValueFromIniFile(const std::string& filePath, const std::string& key);
 
         virtual void PhoneNumberchanged(int number);
+
+        template <typename T>
+        T getValueFromIniFile
+        (const std::string& filePath, const std::string& key, const T& defaultValue = T())
+        {
+            std::ifstream iniFile(filePath);
+            if (!iniFile.is_open()) {
+                std::cerr << "Could not open " << filePath << std::endl;
+                return defaultValue; // Rückgabe des Standardwerts im Fehlerfall
+            }
+
+            std::string line;
+            while (std::getline(iniFile, line)) {
+                // Trim leading and trailing whitespace
+                line.erase(0, line.find_first_not_of(" \t\n\r"));
+                line.erase(line.find_last_not_of(" \t\n\r") + 1);
+
+                // Überspringe Kommentare oder leere Zeilen
+                if (line.empty() || line[0] == ';' || line[0] == '#') {
+                    continue;
+                }
+
+                // Suche nach dem Schlüssel (Key)
+                if (line.find(key + "=") == 0) {
+                    // Extrahiere den Wert hinter dem "="
+                    std::string valueStr = line.substr(line.find("=") + 1);
+
+                    std::istringstream iss(valueStr);
+                    T value;
+                    if (iss >> value) { // Konvertiere den Wert in den gewünschten Typ T
+                        iniFile.close();
+                        return value;
+                    }
+                    else {
+                        std::cerr << "Fehler: Ungültiger Wert für den Schlüssel: " << key << std::endl;
+                        iniFile.close();
+                        return defaultValue;
+                    }
+                }
+            }
+
+            iniFile.close();
+            std::cerr << "Fehler: Schlüssel " << key << " nicht gefunden." << std::endl;
+            return defaultValue; // Rückgabe des Standardwerts, wenn der Schlüssel nicht gefunden wurde
+        }
 
     public:
         QuadratMachine(const std::string& wavePath, const std::string& iniPath)
@@ -133,6 +176,7 @@ namespace miQuadratMachine
             , _SmoothLedIntervall(5) // 100
             , _LightGameIntervall(150) // 100
             , _LampFlashIntervall(250)
+            , _VolumeOffset(25)
             , _GeconIn1("/dev/ttyUSB0", 1, "geconIn1")
             , _GeconIn2("/dev/ttyUSB0", 2, "geconIn2")
             , _GeconOut3("/dev/ttyUSB0", 3, "geconOut3")
@@ -153,7 +197,7 @@ namespace miQuadratMachine
             , _SevenSegmentModule("/dev/spidev0.0", "sevenofnine")
             , _PotentiometerModule(0x48, 0.1, "Volume")
             , _WavePath(wavePath)
-            , _Audio(std::string("plug:dmix0"), _WavePath,34.0)
+            , _Audio(std::string("plug:dmix0"), _WavePath, _VolumeOffset)
             , _LightGame(&_MiComponentManager,_LightGameIntervall)
             , _MiComponentManager()
             , _ModbusTask("ModbusTask",30,0,50,miutils::SchedulerType::Fifo)
@@ -164,50 +208,55 @@ namespace miQuadratMachine
             , _TaskManager()
             , _SegmentNumber(0)
         {
-            int tmp = getValueFromIniFile(iniPath, "ModuleManagerInterval");
+            int tmp = getValueFromIniFile<int>(iniPath, "ModuleManagerInterval");
             if (tmp != -1)
             {
                 _ModuleManagerInterval = tmp;
             }
-            tmp = getValueFromIniFile(iniPath, "RotaryDialModuleIntervall");
+            tmp = getValueFromIniFile<int>(iniPath, "RotaryDialModuleIntervall");
             if (tmp != -1)
             {
                 _RotaryDialModuleIntervall = tmp;
             }
-            tmp = getValueFromIniFile(iniPath, "SevenSegmentModuleIntervall");
+            tmp = getValueFromIniFile<int>(iniPath, "SevenSegmentModuleIntervall");
             if (tmp != -1)
             {
                 _SevenSegmentModuleIntervall = tmp;
             }
-            tmp = getValueFromIniFile(iniPath, "PhoneJackModuleIntervall");
+            tmp = getValueFromIniFile<int>(iniPath, "PhoneJackModuleIntervall");
             if (tmp != -1)
             {
                 _PhoneJackModuleIntervall = tmp;
             }
-            tmp = getValueFromIniFile(iniPath, "ComponentManagerIntervall");
+            tmp = getValueFromIniFile<int>(iniPath, "ComponentManagerIntervall");
             if (tmp != -1)
             {
                 _ComponentManagerIntervall = tmp;
             }
-            tmp = getValueFromIniFile(iniPath, "LedStripIntervall");
+            tmp = getValueFromIniFile<int>(iniPath, "LedStripIntervall");
             if (tmp != -1)
             {
                 _LedStripIntervall = tmp;
             }
-            tmp = getValueFromIniFile(iniPath, "SmoothLedIntervall");
+            tmp = getValueFromIniFile<int>(iniPath, "SmoothLedIntervall");
             if (tmp != -1)
             {
                 _SmoothLedIntervall = tmp;
             }
-            tmp = getValueFromIniFile(iniPath, "LightGameIntervall");
+            tmp = getValueFromIniFile<int>(iniPath, "LightGameIntervall");
             if (tmp != -1)
             {
                 _LightGameIntervall = tmp;
             }
-            tmp = getValueFromIniFile(iniPath, "LampFlashIntervall");
+            tmp = getValueFromIniFile<int>(iniPath, "LampFlashIntervall");
             if (tmp != -1)
             {
                 _LampFlashIntervall = tmp;
+            }
+            double dtmp = getValueFromIniFile<int>(iniPath, "LampFlashIntervall");
+            if (dtmp != -1)
+            {
+                _VolumeOffset = tmp;
             }
 
             

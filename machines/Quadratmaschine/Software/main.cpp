@@ -4,7 +4,6 @@
 
 int main(int argc, char* argv[])
 {
-    int handle = -1;
     if (argc == 2)
     {
 
