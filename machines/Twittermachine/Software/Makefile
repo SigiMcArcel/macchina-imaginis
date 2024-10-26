@@ -7,7 +7,7 @@ INCLUDES = -I. -I/.
 CXXFLAGS = -fpic -Wall -Wl,--no-undefined
 LD_FLAGS = -lmiutils -lmimodules -lmicomponents -lmisound -lasound -lsndfile -lmidriver -lmitasks -lmodbus
 
-SOURCES=main.cpp Twittwermachine.cpp
+SOURCES=main.cpp Twittermachine.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 
 EXEOUT=mitwittermachine
