@@ -183,19 +183,18 @@ namespace miQuadratMachine
             , _GeconOut4("/dev/ttyUSB0", 4, "geconOut4")
             , _RotaryDialModule(_RotaryDialModuleIntervall, "phone", 17, 27)
             , _PhoneJack("PhoneJack",
-                std::vector<mimodule::ModuleMiRpiGpioConfiguration>
-        {
-            {
-                sizeof(mimodule::ModuleMiRpiGpioConfiguration),
-                    mimodule::ModuleMiRpiGpioState::Active,
-                    mimodule::ModulChannelDirection::Input,
-                    5
-            }
-        }
-        )
-
+                        std::vector<mimodule::ModuleMiRpiGpioConfiguration>
+                {
+                    {
+                        sizeof(mimodule::ModuleMiRpiGpioConfiguration),
+                            mimodule::ModuleMiRpiGpioState::Active,
+                            mimodule::ModulChannelDirection::Input,
+                            5
+                    }
+                }
+             )
             , _SevenSegmentModule("/dev/spidev0.0", "sevenofnine")
-            , _PotentiometerModule(0x48, 0.1, "Volume")
+            , _PotentiometerModule(0x48, 0.1, 3300.0,"Volume")
             , _WavePath(wavePath)
             , _Audio(std::string("plug:dmix0"), _WavePath, _VolumeOffset)
             , _LightGame(&_MiComponentManager,_LightGameIntervall)

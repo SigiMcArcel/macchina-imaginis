@@ -9,6 +9,7 @@
 #include <mi/mimodules/ModuleManager.h>
 #include <mi/micomponents/miComponentManager.h>
 #include <mi/mitasks/miTaskManager.h>
+#include <mi/mimodules/ModuleMiRpiGpio.h>
 
 namespace mitwittermachine
 {
@@ -25,6 +26,7 @@ namespace mitwittermachine
         mimodule::ModuleHoerterOutput _HoerterOut3;
         mimodule::ModuleHoerterOutput _HoerterOut4;
         mimodule::ModuleMiPotentiometerADS1115 _PotentiometerModule;
+        mimodule::ModuleMiRpiGpio _PhoneJack;
      
         std::string _WavePath;
         misound::Audio _Audio;
@@ -55,13 +57,24 @@ namespace mitwittermachine
             : _ModuleManagerInterval(10)
             , _ComponentManagerIntervall(1)
             , _LampFlashIntervall(250)
-            , _HoerterIn1(1, "hoerterIn1")
-            , _HoerterIn2(2, "hoerterIn1")
-            , _HoerterOut3(3, "hoerterOut3")
-            , _HoerterOut4(4, "hoerterOut4")
-            , _PotentiometerModule(0x48, 0.1, "Volume")
+            , _HoerterIn1(0x21, "hoerterIn1")
+            , _HoerterIn2(0x39, "hoerterIn1")
+            , _HoerterOut3(0x20, "hoerterOut3")
+            , _HoerterOut4(0x38, "hoerterOut4")
+            , _PotentiometerModule(0x48, 0.1,5000.0, "Volume")
+            , _PhoneJack("PhoneJack",
+                std::vector<mimodule::ModuleMiRpiGpioConfiguration>
+                {
+                    {
+                        sizeof(mimodule::ModuleMiRpiGpioConfiguration),
+                            mimodule::ModuleMiRpiGpioState::Active,
+                            mimodule::ModulChannelDirection::Input,
+                            5
+                    }
+                }
+            )
             , _WavePath(wavePath)
-            , _Audio(std::string("plug:dmix0"), _WavePath,34.0)
+            , _Audio(std::string("plug:dmix0"), _WavePath,0.0,misound::VolumeTranspose::linear)
             , _MiComponentManager()
             , _HoerterTask("HoerterTask", 30, 0, 50, miutils::SchedulerType::Fifo)
             , _AudioTask("AudioTask", 20, 0, 20, miutils::SchedulerType::Other)
@@ -78,6 +91,7 @@ namespace mitwittermachine
             _HoerterTask.addComponent(&_MiComponentManager);
           
             _AudioTask.addIOModul(&_PotentiometerModule);
+            _AudioTask.addIOModul(&_PhoneJack);
 
             _TaskManager.AddTask(&_HoerterTask);
             _TaskManager.AddTask(&_AudioTask);

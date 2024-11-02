@@ -64,18 +64,32 @@ void mitwittermachine::TwitterMachine::createAndAddWaveButtonLamp(
 void mitwittermachine::TwitterMachine::createComponents()
 {
 
-	createAndAddWaveButtonLamp("s1p1", "E1.0", "A3.0", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
-	
+	createAndAddWaveButtonLamp("a1", "E33.0", "A32.0", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a2", "E33.1", "A32.1", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a3", "E33.2", "A32.2", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a4", "E33.3", "A32.3", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a5", "E33.4", "A32.4", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a6", "E33.5", "A32.5", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a7", "E33.6", "A32.6", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a8", "E33.7", "A32.7", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a9", "E57.0", "A56.0", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a10", "E57.1", "A56.1", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a11", "E57.2", "A56.2", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a12", "E57.3", "A56.3", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a13", "E57.4", "A56.4", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a14", "E57.5", "A56.5", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a15", "E57.6", "A56.6", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
+	createAndAddWaveButtonLamp("a16", "E57.7", "A56.7", micomponents::ButtonType::Switch, micomponents::LampType::Flash, true);
 	
 	_MiComponentManager.registerComponent<micomponents::miAudio>(
 		"miAudio",
 		-1,
 		_PotentiometerModule.getChannel("Potentiometer"),
-		nullptr,
+		_PhoneJack.getChannel("GPIO5"),
 		_Audio,
 		100.0,
-		"plug:dmix0",
-		"plug:dmix1");
+		"plug:dmix1",
+		"plug:dmix0");
 	_MiAudio = _MiComponentManager.getComponent<micomponents::miAudio>("miAudio");
 	_AudioTask.addComponent(_MiComponentManager.getComponent<micomponents::miComponentBase>("miAudio").get());
 }

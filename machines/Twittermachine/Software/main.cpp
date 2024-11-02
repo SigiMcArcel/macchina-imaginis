@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
     {
 
         if (::strcmp(argv[1], "-d") == 0) {
-            printf("mi quadrat nachine daemonize\n");
+            printf("mi twitter nachine daemonize\n");
             if (::daemon(1, 1)) {
                 perror("Unable to daemonize");
                 return 1;
@@ -16,10 +16,10 @@ int main(int argc, char* argv[])
         }
     }
 
-    fprintf(stderr,"mi quadrat machine\n");
+    fprintf(stderr,"mi twitter machine\n");
     
-    const std::string _WavePath = std::string("/home/root/sounds");
-    mitwittermachine::TwitterMachine _TwitterMachine(_WavePath,"/home/root/quadrat.ini");
+    const std::string _WavePath = std::string("/usr/share/misounds");
+    mitwittermachine::TwitterMachine _TwitterMachine(_WavePath,"/home/root/twitter.ini");
     _TwitterMachine.start();
 
     while (true)
