@@ -74,7 +74,7 @@ namespace mitwittermachine
                 }
             )
             , _WavePath(wavePath)
-            , _Audio(std::string("plug:dmix0"), _WavePath,0.0,misound::VolumeTranspose::linear)
+            , _Audio(std::string("plug:dmix0"), _WavePath,0.0,60.0,misound::VolumeScaleMode::linear)
             , _MiComponentManager()
             , _HoerterTask("HoerterTask", 30, 0, 50, miutils::SchedulerType::Fifo)
             , _AudioTask("AudioTask", 20, 0, 20, miutils::SchedulerType::Other)

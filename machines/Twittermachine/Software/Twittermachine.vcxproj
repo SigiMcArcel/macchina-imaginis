@@ -86,7 +86,7 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <Link>
-      <LibraryDependencies>miutils;mimodules;micomponents;misound;asound;midriver;mitasks;modbus</LibraryDependencies>
+      <LibraryDependencies>miutils;mimodules;micomponents;misound;midriver;mitasks</LibraryDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
