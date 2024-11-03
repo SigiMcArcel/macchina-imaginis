@@ -61,7 +61,7 @@ namespace mitwittermachine
             , _HoerterIn2(0x39, "hoerterIn1")
             , _HoerterOut3(0x20, "hoerterOut3")
             , _HoerterOut4(0x38, "hoerterOut4")
-            , _PotentiometerModule(0x48, 0.1,5000.0, "Volume")
+            , _PotentiometerModule(0x48, 0.1, 5000.0, 5000.0, "Volume")
             , _PhoneJack("PhoneJack",
                 std::vector<mimodule::ModuleMiRpiGpioConfiguration>
                 {
@@ -74,7 +74,7 @@ namespace mitwittermachine
                 }
             )
             , _WavePath(wavePath)
-            , _Audio(std::string("plug:dmix0"), _WavePath,0.0,60.0,misound::VolumeScaleMode::linear)
+            , _Audio(std::string("plug:dmix0"), _WavePath)
             , _MiComponentManager()
             , _HoerterTask("HoerterTask", 30, 0, 50, miutils::SchedulerType::Fifo)
             , _AudioTask("AudioTask", 20, 0, 20, miutils::SchedulerType::Other)

@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 
     fprintf(stderr,"mi twitter machine\n");
     
-    const std::string _WavePath = std::string("/usr/share/misounds");
+    const std::string _WavePath = std::string("/usr/share/misound/sounds");
     mitwittermachine::TwitterMachine _TwitterMachine(_WavePath,"/home/root/twitter.ini");
     _TwitterMachine.start();
 
