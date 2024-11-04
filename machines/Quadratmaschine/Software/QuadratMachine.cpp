@@ -337,7 +337,7 @@ void miQuadratMachine::QuadratMachine::createComponents()
 	createAndAddWaveButtonLamp("s5p5", "E1.4", "A3.4", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
 	createAndAddWaveButtonLamp("s6p6", "E1.5", "A3.5", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
 	createAndAddWaveButtonLamp("s7p7", "E1.6", "A3.6", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true);
-	//createAndAddWaveButtonLamp("s8p8", "E1.7", "A3.7", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true); //defect
+	createAndAddWaveButtonLamp("s8p8", "E1.7", "A3.7", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true); //defect
 	createAndAddWaveButtonLamp("s9p9", "E1.8", "A3.8", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);
 	createAndAddWaveButtonLamp("s10p10", "E1.9", "A3.9", micomponents::ButtonType::Switch, micomponents::LampType::Fix, true);
 	createAndAddWaveButtonLamp("s11p11", "E1.10", "A3.10", micomponents::ButtonType::PushButtonToggle, micomponents::LampType::Flash, false);

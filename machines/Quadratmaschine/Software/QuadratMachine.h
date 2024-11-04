@@ -194,9 +194,9 @@ namespace miQuadratMachine
                 }
              )
             , _SevenSegmentModule("/dev/spidev0.0", "sevenofnine")
-            , _PotentiometerModule(0x48, 0.1, 3300.0,"Volume")
+            , _PotentiometerModule(0x48, 0.1, 3300.0,3300.0,"Volume")
             , _WavePath(wavePath)
-            , _Audio(std::string("plug:dmix0"), _WavePath, _VolumeOffset)
+            , _Audio(std::string("plug:dmix0"), _WavePath)
             , _LightGame(&_MiComponentManager,_LightGameIntervall)
             , _MiComponentManager()
             , _ModbusTask("ModbusTask",30,0,50,miutils::SchedulerType::Fifo)
